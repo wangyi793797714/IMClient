@@ -14,5 +14,4 @@ public class TestFragment extends BaseFragment {
         View view = makeView(R.layout.main_frag_four);
         return view;
     }
-
 }

@@ -103,7 +103,6 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-//            final String url = Const.BASE_URL + "online?n=" + info.getChannelId();
             final String url = Const.BASE_URL + "friend?n=" + info.getChannelId();
             HttpHeaders reqtHeaders = new HttpHeaders();
             List<MediaType> acceptMediaTypes = new ArrayList<MediaType>();

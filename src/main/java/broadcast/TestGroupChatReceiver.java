@@ -15,10 +15,10 @@ import config.Const;
 
 public class TestGroupChatReceiver extends BroadcastReceiver {
 
-   private ExpandableListView exListView;
+    private ExpandableListView exListView;
 
     private Activity act;
-    
+
     public TestGroupChatReceiver(Activity act, ExpandableListView exListView) {
         this.exListView = exListView;
         this.act = act;

@@ -30,7 +30,7 @@ public class ReqestCreateChatRoomReceiver extends BroadcastReceiver {
             final FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
             adapter.addRoom(room);
             db.save(room);
-            for (RoomChild child:room.getChildDatas()) {
+            for (RoomChild child : room.getChildDatas()) {
                 db.save(child);
             }
             Toast.makeText(act, "收到聊天邀请", Toast.LENGTH_SHORT).show();

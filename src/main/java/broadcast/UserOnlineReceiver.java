@@ -37,8 +37,11 @@ public class UserOnlineReceiver extends BroadcastReceiver {
                         Myself u = onlineUsers.get(i);
                         onlineUsers.get(i).setOnline(true);
                         adapter.refresh();
-                       // 好友上线，保存好友在线信息
-                        db.save(u);
+                        // 好友上线，保存好友在线信息
+                        OnlineFriends friend = new OnlineFriends();
+                        friend.setChannelId(u.getChannelId());
+                        friend.setName(u.getName());
+                        db.save(friend);
                         return;
                     }
                 }
@@ -51,7 +54,7 @@ public class UserOnlineReceiver extends BroadcastReceiver {
                         Myself u = onlineUsers.get(i);
                         onlineUsers.get(i).setOnline(false);
                         adapter.refresh();
-                        //好友下线，删除sd中保存的在线信息
+                        // 好友下线，删除sd中保存的在线信息
                         db.deleteByWhere(OnlineFriends.class, "channelId = " + u.getChannelId());
                         return;
                     }
