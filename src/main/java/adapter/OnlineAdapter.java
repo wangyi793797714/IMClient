@@ -33,6 +33,8 @@ public class OnlineAdapter extends SimpleAdapter<Myself> {
         holder.name.setText(user.getName());
         if(user.isOnline()){
             holder.isOnlien.setText("在线");
+        }else{
+            holder.isOnlien.setText("下线");
         }
         return convertView;
     }

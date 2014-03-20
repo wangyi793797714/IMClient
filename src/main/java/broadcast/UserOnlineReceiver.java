@@ -31,21 +31,28 @@ public class UserOnlineReceiver extends BroadcastReceiver {
             // 上线
             FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
             if (user.getName() != null) {
-                OnlineFriends on = new OnlineFriends();
-                on.setChannelId(user.getChannelId());
-                on.setName(user.getName());
-                db.save(on);
-                adapter.addItem(user, adapter.getCount());
+                List<Myself> onlineUsers = adapter.getDataSource();
+                for (int i = 0; i < onlineUsers.size(); i++) {
+                    if (user.getChannelId() == onlineUsers.get(i).getChannelId()) {
+                        Myself u = onlineUsers.get(i);
+                        onlineUsers.get(i).setOnline(true);
+                        adapter.refresh();
+                       // 好友上线，保存好友在线信息
+                        db.save(u);
+                        return;
+                    }
+                }
             }
             // 下线
             else {
                 List<Myself> onlineUsers = adapter.getDataSource();
                 for (int i = 0; i < onlineUsers.size(); i++) {
                     if (user.getChannelId() == onlineUsers.get(i).getChannelId()) {
-                        Myself u =onlineUsers.get(i);
-                        adapter.remove(onlineUsers.get(i));
-                        //TODO用户下线，删除
-                        db.deleteByWhere(OnlineFriends.class, "channelId = "+u.getChannelId());
+                        Myself u = onlineUsers.get(i);
+                        onlineUsers.get(i).setOnline(false);
+                        adapter.refresh();
+                        //好友下线，删除sd中保存的在线信息
+                        db.deleteByWhere(OnlineFriends.class, "channelId = " + u.getChannelId());
                         return;
                     }
                 }

@@ -6,7 +6,7 @@ import net.tsz.afinal.annotation.sqlite.Table;
 
 /**
  * 
- *  @desc:仅仅作为用户上线下线的标志
+ *  @desc:仅仅作为用户上线下线的标志,客户端只保存在线的好友
  *  @author WY 
  *  创建时间 2014年3月19日 上午11:19:26
  */
