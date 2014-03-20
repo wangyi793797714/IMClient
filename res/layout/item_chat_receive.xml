@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   >
+    <TextView 
+        android:id="@+id/sender_name"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:textSize="15sp"
+        android:textColor="#329e1c"
+        android:text="测试"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        />
+    <TextView 
+        android:id="@+id/sender_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="#aec7e1"
+        android:minHeight="40dp"
+        android:text="打发打发打发放大法阿发阿道夫阿道夫阿发放大啊"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/sender_name"
+        />
+</RelativeLayout>

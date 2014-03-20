@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/lsitview_item_bg"
+   >
+    <TextView 
+        android:id="@+id/user_name"
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:textSize="15sp"
+        android:textColor="#e45f12"
+        android:gravity="center_vertical"
+        />
+    <Button 
+        android:id="@+id/msg_tips"
+        android:layout_width="50dp"
+        android:layout_height="45dp"
+        android:layout_alignParentRight="true"
+        android:focusableInTouchMode="false"
+        android:focusable="false"
+        android:visibility="invisible"
+        android:layout_marginRight="50dp"
+        />
+    <TextView 
+        android:id="@+id/is_online"
+        android:layout_width="50dp"
+        android:layout_height="45dp"
+        android:layout_alignParentRight="true"
+        android:focusableInTouchMode="false"
+        android:focusable="false"
+        android:text="不在线"
+        android:textSize="15dp"
+        android:textColor="#329e1c"
+        android:gravity="center_vertical"
+        />
+</RelativeLayout>

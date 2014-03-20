@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/metro_bg"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/add_friend"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:text="添加好友" />
+
+    <ListView
+        android:id="@+id/lv_chat_detail"
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent" >
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="50dp" />
+        <Button
+            android:id="@+id/send"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="发送" />
+    </RelativeLayout>
+</LinearLayout>
