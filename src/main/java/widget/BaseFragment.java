@@ -70,5 +70,4 @@ public abstract class BaseFragment extends Fragment {
             Toast.makeText(getActivity(), "提示内容为空", dur).show();
         }
     }
-    
 }

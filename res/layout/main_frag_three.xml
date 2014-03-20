@@ -5,14 +5,6 @@
     android:background="@drawable/metro_bg"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/create_chat_room"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:textColor="#1B254B"
-        android:text="创建聊天室" />
     <ExpandableListView
         android:id="@+id/chat_room_list"
         android:layout_width="fill_parent"

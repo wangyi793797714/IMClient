@@ -10,6 +10,11 @@ import com.activity.R;
 public class FourthFragment extends BaseFragment {
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = makeView(R.layout.main_frag_four);
         return view;
