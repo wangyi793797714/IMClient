@@ -5,7 +5,7 @@ import java.util.List;
 import net.tsz.afinal.FinalDb;
 import util.FileOperator;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import adapter.OnlineAdapter;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -38,10 +38,11 @@ public class UserOnlineReceiver extends BroadcastReceiver {
                         onlineUsers.get(i).setOnline(true);
                         adapter.refresh();
                         // 好友上线，保存好友在线信息
-                        OnlineFriends friend = new OnlineFriends();
+                        Friends friend = new Friends();
                         friend.setChannelId(u.getChannelId());
                         friend.setName(u.getName());
-                        db.save(friend);
+                        friend.setOnline(true);
+                        db.update(friend, "channelId = "+u.getChannelId());
                         return;
                     }
                 }
@@ -55,7 +56,11 @@ public class UserOnlineReceiver extends BroadcastReceiver {
                         onlineUsers.get(i).setOnline(false);
                         adapter.refresh();
                         // 好友下线，删除sd中保存的在线信息
-                        db.deleteByWhere(OnlineFriends.class, "channelId = " + u.getChannelId());
+                        Friends friend = new Friends();
+                        friend.setChannelId(u.getChannelId());
+                        friend.setName(u.getName());
+                        friend.setOnline(false);
+                        db.update(friend, "channelId = "+u.getChannelId());
                         return;
                     }
                 }

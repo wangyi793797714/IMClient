@@ -21,6 +21,7 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.RelativeLayout;
 import application.IMApplication;
+import broadcast.RefreshChatRoomReceiver;
 import broadcast.ReqestCreateChatRoomReceiver;
 import broadcast.TestGroupChatReceiver;
 
@@ -39,7 +40,7 @@ public class ThirdFragment extends BaseFragment {
     private int sign = -1;
 
     private createRoom create;
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -61,6 +62,12 @@ public class ThirdFragment extends BaseFragment {
         ReqestCreateChatRoomReceiver receiver = new ReqestCreateChatRoomReceiver(adapter,
                 getActivity());
         IMApplication.APP.reReceiver(receiver, Filter1);
+
+        IntentFilter Filter2 = new IntentFilter();
+        Filter2.addAction(Const.ACTION_ADD_FRIENDTOCHAT);
+        RefreshChatRoomReceiver receiver2 = new RefreshChatRoomReceiver(adapter);
+        IMApplication.APP.reReceiver(receiver2, Filter2);
+
     }
 
     @Override

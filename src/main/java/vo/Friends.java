@@ -11,8 +11,8 @@ import net.tsz.afinal.annotation.sqlite.Table;
  *  创建时间 2014年3月19日 上午11:19:26
  */
 @SuppressWarnings("serial")
-@Table(name = "online_friends")
-public class OnlineFriends implements Serializable {
+@Table(name = "friends")
+public class Friends implements Serializable {
 
     private int id;
 
@@ -22,6 +22,9 @@ public class OnlineFriends implements Serializable {
     /**好友编号*/
     private int channelId;
 
+    /**是否在线*/
+    private boolean isOnline;
+    
     public String getName() {
         return name;
     }
@@ -46,8 +49,11 @@ public class OnlineFriends implements Serializable {
         this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return "User [name=" + name + ", channelId=" + channelId + "]";
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean isOnline) {
+        this.isOnline = isOnline;
     }
 }

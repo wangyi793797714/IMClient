@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import util.FileOperator;
 import util.Util;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import adapter.OnlineAdapter;
 import android.app.Activity;
 import config.Const;
@@ -68,9 +68,10 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
             adapter.addItems(arrayList);
             FinalDb  db=FinalDb.create(act,FileOperator.getDbPath(act),true);
             for (Myself u:arrayList) {
-                OnlineFriends on= new OnlineFriends();
+                Friends on= new Friends();
                 on.setChannelId(u.getChannelId());
                 on.setName(u.getName());
+                on.setOnline(u.isOnline());
                 db.save(on);
             }
         }
@@ -96,7 +97,7 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
         if (channel != null && channel.isRegistered()) {
             try {
                 // 上线，通知他人
-                OnlineFriends user = new OnlineFriends();
+                Friends user = new Friends();
                 user.setName(info.getName());
                 user.setChannelId(info.getChannelId());
                 channel.writeAndFlush(user).sync();

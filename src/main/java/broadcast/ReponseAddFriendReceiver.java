@@ -4,7 +4,7 @@ import net.tsz.afinal.FinalDb;
 import util.FileOperator;
 import vo.AddFriendResponse;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import adapter.OnlineAdapter;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -41,7 +41,7 @@ public class ReponseAddFriendReceiver extends BroadcastReceiver {
                 adapter.addItem(respFriend, 0);
                 // 新增好友成功，将好友视作上线的好友，保存到sd卡中
                 FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
-                OnlineFriends friend = new OnlineFriends();
+                Friends friend = new Friends();
                 friend.setChannelId(resp.getRespFriend().getChannelId());
                 friend.setName(resp.getRespFriend().getName());
                 db.save(friend);

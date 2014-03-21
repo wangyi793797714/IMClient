@@ -3,6 +3,7 @@ package netty4;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +12,15 @@ import vo.AddFriendRequest;
 import vo.AddFriendResponse;
 import vo.ChatRoom;
 import vo.Content;
+import vo.FriendBody;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.activity.ChatGroupAct;
 import com.activity.ChatSingleAct;
@@ -114,8 +117,8 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                 }
             }
             act.sendBroadcast(intent);
-        } else if (msg instanceof OnlineFriends) {
-            final OnlineFriends user = (OnlineFriends) msg;
+        } else if (msg instanceof Friends) {
+            final Friends user = (Friends) msg;
             Intent intent = new Intent();
             intent.setAction(Const.ACTION_ON_OR_OFF_LINE);
             Myself self = new Myself();
@@ -144,6 +147,12 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
             Intent intent = new Intent();
             intent.setAction(Const.ACTION_ADDFRIEND_REPONSE);
             intent.putExtra("resp", resp);
+            act.sendBroadcast(intent);
+        } else if (msg instanceof FriendBody) {
+            FriendBody body = (FriendBody) msg;
+            Intent intent = new Intent();
+            intent.setAction(Const.ACTION_ADD_FRIENDTOCHAT);
+            intent.putExtra("newFriend", body);
             act.sendBroadcast(intent);
         }
     }

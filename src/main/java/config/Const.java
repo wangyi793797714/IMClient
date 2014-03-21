@@ -27,7 +27,11 @@ public interface Const {
     
     /** 收到私聊消息 */
     public static final String ACTION_SINGLE_MSG = "single_msg";
+    
+    /** 群里界面新增好友，通知主界面更新列表*/
+    public static final String ACTION_ADD_FRIENDTOCHAT = "addFriend2chatRoom";
 
+    
     public static final String BASE_URL = "http://192.168.1.84:8080/IMServer/api/";
 
     public static final String DB_FOLDER_NAME = "IM";

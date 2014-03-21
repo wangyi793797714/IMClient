@@ -13,8 +13,9 @@ import util.FileOperator;
 import util.Util;
 import vo.ChatRoom;
 import vo.Content;
+import vo.FriendBody;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import vo.RoomChild;
 import adapter.ChatAdapter;
 import adapter.GroupChatAdapter;
@@ -34,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import application.IMApplication;
+import aysntask.AddFriendToRoomTask;
 import aysntask.FetchOnlineUserTask;
 import aysntask.LoginTask;
 import config.Const;
@@ -66,7 +68,9 @@ public class ChatGroupAct extends BaseActivity {
         setContentView(R.layout.group_chat);
         initView();
         registerBoradcastReceiver(new msgBroadcastReceiver());
-        friends = ((ChatRoom) getVo("0")).getChildDatas();
+        final ChatRoom room=  ((ChatRoom) getVo("0"));
+        final int position = (Integer) getVo("1");
+        friends = room.getChildDatas();
         CurrentGroup = friends.get(0).getGroupTag();
         getActionBar().setCustomView(R.layout.main_action_button);
         getActionBar().setDisplayShowCustomEnabled(true);
@@ -83,28 +87,19 @@ public class ChatGroupAct extends BaseActivity {
                     builder.setView(view);
                     ListView list = (ListView) view.findViewById(R.id.group_chat_list);
                     FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
-                    //TODO获取在线的好友列表
+                    //TODO获取在线的好友列表,同已经在此群组里的好友取差集，便是不在此聊天群组中的在线好友
                     
-                    List<OnlineFriends> onlines = db.findAll(OnlineFriends.class);
+                    List<Friends> onlines = db.findAllByWhere(Friends.class, "isOnline = 1");
                     List<Myself> onlineUser = new ArrayList<Myself>();
                     if (!Util.isEmpty(onlines)) {
-                        for (OnlineFriends on : onlines) {
+                        for (Friends on : onlines) {
                             Myself me = new Myself();
                             me.setChannelId(on.getChannelId());
                             me.setName(on.getName());
                             onlineUser.add(me);
                         }
                     }
-                    
-                    List<RoomChild> src = new ArrayList<RoomChild>();
-                    if (!Util.isEmpty(onlineUser)) {
-                        for (Myself u : onlineUser) {
-                            RoomChild child = new RoomChild();
-                            child.setChannelId(u.getChannelId());
-                            child.setName(u.getName());
-                            src.add(child);
-                        }
-                    }
+                   
                     List<RoomChild> existChilds = friends;
                     if (!Util.isEmpty(onlineUser)) {
                         for (int i = 0; i < onlineUser.size(); i++) {
@@ -117,6 +112,15 @@ public class ChatGroupAct extends BaseActivity {
                             }
                         }
                     }
+                    List<RoomChild> src = new ArrayList<RoomChild>();
+                    if (!Util.isEmpty(onlineUser)) {
+                        for (Myself u : onlineUser) {
+                            RoomChild child = new RoomChild();
+                            child.setChannelId(u.getChannelId());
+                            child.setName(u.getName());
+                            src.add(child);
+                        }
+                    }
                     final GroupChatAdapter gcAdapter = new GroupChatAdapter(src, activity);
                     list.setAdapter(gcAdapter);
                     builder.setPositiveButton("确定", new Dialog.OnClickListener() {
@@ -124,18 +128,24 @@ public class ChatGroupAct extends BaseActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             List<RoomChild> tempList = new ArrayList<RoomChild>();
+                            List<Integer> targetIds=new ArrayList<Integer>();
                             for (int i = 0; i < gcAdapter.isChecked.size(); i++) {
                                 if (gcAdapter.isChecked.get(i)) {
                                     RoomChild checkedUser = gcAdapter.getItem(i);
                                     RoomChild child = new RoomChild();
                                     child.setChannelId(checkedUser.getChannelId());
                                     child.setName(checkedUser.getName());
+                                    child.setGroupTag(CurrentGroup);
+                                    targetIds.add(checkedUser.getChannelId());
                                     tempList.add(child);
                                 }
                             }
                             if (!Util.isEmpty(tempList)) {
                                 friends.addAll(tempList);
                             }
+                            FriendBody vo = new FriendBody();
+                            vo.setRoom(room);
+                            new AddFriendToRoomTask(activity,tempList,position).execute(vo);
                         }
                     });
                     builder.create();

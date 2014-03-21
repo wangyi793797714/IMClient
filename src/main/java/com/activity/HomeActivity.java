@@ -14,7 +14,7 @@ import util.Util;
 import vo.ChatRoom;
 import vo.Content;
 import vo.Myself;
-import vo.OnlineFriends;
+import vo.Friends;
 import vo.RoomChild;
 import widget.FirstFragment;
 import widget.FirstFragment.Regist;
@@ -388,10 +388,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                     FinalDb db = FinalDb.create(HomeActivity.this,
                             FileOperator.getDbPath(HomeActivity.this), true);
                     // TODO获取在线的好友列表
-                    List<OnlineFriends> onlines = db.findAll(OnlineFriends.class);
+                    List<Friends> onlines = db.findAllByWhere(Friends.class, "isOnline = 1");
                     List<Myself> tempFriends = new ArrayList<Myself>();
                     if (!Util.isEmpty(onlines)) {
-                        for (OnlineFriends on : onlines) {
+                        for (Friends on : onlines) {
                             Myself me = new Myself();
                             me.setChannelId(on.getChannelId());
                             me.setName(on.getName());
@@ -492,9 +492,9 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                             // 删除所有的在线者
                             IMApplication.APP.closeReceiver();
                             // TODO
-                            db.deleteAll(OnlineFriends.class);
+                            db.deleteAll(Friends.class);
                             if (FetchOnlineUserTask.channel != null) {
-                                OnlineFriends myInfo = new OnlineFriends();
+                                Friends myInfo = new Friends();
                                 myInfo.setChannelId(db.findAll(Myself.class).get(0).getChannelId());
                                 myInfo.setName(null);
                                 FetchOnlineUserTask.channel.writeAndFlush(myInfo).addListener(

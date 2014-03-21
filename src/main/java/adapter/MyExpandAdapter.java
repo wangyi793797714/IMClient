@@ -2,6 +2,8 @@ package adapter;
 
 import java.util.List;
 
+import net.tsz.afinal.FinalDb;
+import util.FileOperator;
 import util.Util;
 import vo.ChatRoom;
 import vo.Myself;
@@ -19,6 +21,8 @@ import android.widget.TextView;
 
 import com.activity.ChatGroupAct;
 import com.activity.R;
+
+import config.Const;
 
 /**
  * 
@@ -101,6 +105,7 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
                 Intent intent = new Intent();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("0", data.get(groupPosition));
+                bundle.putSerializable("1", groupPosition);
                 intent.putExtras(bundle);
                 intent.setClass(context, ChatGroupAct.class);
                 context.startActivity(intent);
@@ -136,7 +141,6 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
 
     public void addChild(int groupPosition, List<RoomChild> u) {
         data.get(groupPosition).addToChilds(u);
-        ;
         notifyDataSetChanged();
     }
 
@@ -155,8 +159,8 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
         notifyDataSetChanged();
     }
 
-    public void removeRoom(int positon) {
-        data.remove(positon);
+    public void removeRoom(int position) {
+        data.remove(position);
         notifyDataSetChanged();
     }
 
@@ -171,5 +175,30 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
             return false;
         }
         return true;
+    }
+
+    public void refreshRoom(long roomTag, ChatRoom newRoom) {
+        boolean roomExisit = false;
+        for (int i = 0; i < data.size(); i++) {
+            ChatRoom room = data.get(i);
+            if (room.getGrouppTag() == roomTag) {
+                data.set(i, newRoom);
+                roomExisit = true;
+            }
+        }
+        if (roomExisit) {
+            final FinalDb db = FinalDb.create(context, FileOperator.getDbPath(context), true);
+            db.deleteByWhere(RoomChild.class, "GroupTag = " + newRoom.getGrouppTag());
+            for (RoomChild child : newRoom.getChildDatas()) {
+                db.save(child);
+            }
+        }
+        notifyDataSetChanged();
+        if (!roomExisit) {
+            Intent intent = new Intent();
+            intent.setAction(Const.ACTION_CREATE_CHAT_ROOM);
+            intent.putExtra("room", newRoom);
+            context.sendBroadcast(intent);
+        }
     }
 }
