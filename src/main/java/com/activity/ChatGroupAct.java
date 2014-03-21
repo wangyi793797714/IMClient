@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import application.IMApplication;
 import aysntask.FetchOnlineUserTask;
@@ -38,8 +39,6 @@ import aysntask.LoginTask;
 import config.Const;
 
 public class ChatGroupAct extends BaseActivity {
-
-    private Button addFriend;
 
     private ListView chatList;
 
@@ -69,85 +68,87 @@ public class ChatGroupAct extends BaseActivity {
         registerBoradcastReceiver(new msgBroadcastReceiver());
         friends = ((ChatRoom) getVo("0")).getChildDatas();
         CurrentGroup = friends.get(0).getGroupTag();
+        getActionBar().setCustomView(R.layout.main_action_button);
+        getActionBar().setDisplayShowCustomEnabled(true);
+        ImageView addFriend=(ImageView)getActionBar().getCustomView();
+        addFriend.setBackgroundDrawable(getDrawableRes(R.drawable.add_friend_drawable));
+        addFriend.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                    Builder builder = new AlertDialog.Builder(activity);
+                    builder.setTitle("请选择好友");
+                    builder.setIcon(android.R.drawable.ic_dialog_info);
+                    View view = makeView(R.layout.group_chat_list);
+                    builder.setView(view);
+                    ListView list = (ListView) view.findViewById(R.id.group_chat_list);
+                    FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
+                    //TODO获取在线的好友列表
+                    
+                    List<OnlineFriends> onlines = db.findAll(OnlineFriends.class);
+                    List<Myself> onlineUser = new ArrayList<Myself>();
+                    if (!Util.isEmpty(onlines)) {
+                        for (OnlineFriends on : onlines) {
+                            Myself me = new Myself();
+                            me.setChannelId(on.getChannelId());
+                            me.setName(on.getName());
+                            onlineUser.add(me);
+                        }
+                    }
+                    
+                    List<RoomChild> src = new ArrayList<RoomChild>();
+                    if (!Util.isEmpty(onlineUser)) {
+                        for (Myself u : onlineUser) {
+                            RoomChild child = new RoomChild();
+                            child.setChannelId(u.getChannelId());
+                            child.setName(u.getName());
+                            src.add(child);
+                        }
+                    }
+                    List<RoomChild> existChilds = friends;
+                    if (!Util.isEmpty(onlineUser)) {
+                        for (int i = 0; i < onlineUser.size(); i++) {
+                            for (RoomChild user : existChilds) {
+                                if (onlineUser.get(i).getChannelId() == user.getChannelId()) {
+                                    onlineUser.remove(i);
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    final GroupChatAdapter gcAdapter = new GroupChatAdapter(src, activity);
+                    list.setAdapter(gcAdapter);
+                    builder.setPositiveButton("确定", new Dialog.OnClickListener() {
 
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            List<RoomChild> tempList = new ArrayList<RoomChild>();
+                            for (int i = 0; i < gcAdapter.isChecked.size(); i++) {
+                                if (gcAdapter.isChecked.get(i)) {
+                                    RoomChild checkedUser = gcAdapter.getItem(i);
+                                    RoomChild child = new RoomChild();
+                                    child.setChannelId(checkedUser.getChannelId());
+                                    child.setName(checkedUser.getName());
+                                    tempList.add(child);
+                                }
+                            }
+                            if (!Util.isEmpty(tempList)) {
+                                friends.addAll(tempList);
+                            }
+                        }
+                    });
+                    builder.create();
+                    builder.show();
+            }
+        });
     }
 
     public void initView() {
-        addFriend = (Button) findViewById(R.id.add_friend);
         chatList = (ListView) findViewById(R.id.lv_chat_detail);
         sendBtn = (Button) findViewById(R.id.send);
         input = (EditText) findViewById(R.id.content);
         chatList.setAdapter(chatAdapter);
-        addFriend.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Builder builder = new AlertDialog.Builder(activity);
-                builder.setTitle("请选择好友");
-                builder.setIcon(android.R.drawable.ic_dialog_info);
-                View view = makeView(R.layout.group_chat_list);
-                builder.setView(view);
-                ListView list = (ListView) view.findViewById(R.id.group_chat_list);
-                FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
-                //TODO获取在线的好友列表
-                
-                List<OnlineFriends> onlines = db.findAll(OnlineFriends.class);
-                List<Myself> onlineUser = new ArrayList<Myself>();
-                if (!Util.isEmpty(onlines)) {
-                    for (OnlineFriends on : onlines) {
-                        Myself me = new Myself();
-                        me.setChannelId(on.getChannelId());
-                        me.setName(on.getName());
-                        onlineUser.add(me);
-                    }
-                }
-                
-                List<RoomChild> src = new ArrayList<RoomChild>();
-                if (!Util.isEmpty(onlineUser)) {
-                    for (Myself u : onlineUser) {
-                        RoomChild child = new RoomChild();
-                        child.setChannelId(u.getChannelId());
-                        child.setName(u.getName());
-                        src.add(child);
-                    }
-                }
-                List<RoomChild> existChilds = friends;
-                if (!Util.isEmpty(onlineUser)) {
-                    for (int i = 0; i < onlineUser.size(); i++) {
-                        for (RoomChild user : existChilds) {
-                            if (onlineUser.get(i).getChannelId() == user.getChannelId()) {
-                                onlineUser.remove(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
-                }
-                final GroupChatAdapter gcAdapter = new GroupChatAdapter(src, activity);
-                list.setAdapter(gcAdapter);
-                builder.setPositiveButton("确定", new Dialog.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        List<RoomChild> tempList = new ArrayList<RoomChild>();
-                        for (int i = 0; i < gcAdapter.isChecked.size(); i++) {
-                            if (gcAdapter.isChecked.get(i)) {
-                                RoomChild checkedUser = gcAdapter.getItem(i);
-                                RoomChild child = new RoomChild();
-                                child.setChannelId(checkedUser.getChannelId());
-                                child.setName(checkedUser.getName());
-                                tempList.add(child);
-                            }
-                        }
-                        if (!Util.isEmpty(tempList)) {
-                            friends.addAll(tempList);
-                        }
-                    }
-                });
-                builder.create();
-                builder.show();
-            }
-        });
 
         sendBtn.setOnClickListener(new OnClickListener() {
 
@@ -206,7 +207,6 @@ public class ChatGroupAct extends BaseActivity {
         IntentFilter myIntentFilter = new IntentFilter();
         myIntentFilter.addAction(Const.ACTION_GROUP_CHAT);
         // 注册广播
-//        registerReceiver(receiver, myIntentFilter);
         IMApplication.APP.reReceiver(receiver, myIntentFilter);
     }
 }

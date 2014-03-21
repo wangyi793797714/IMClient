@@ -29,17 +29,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.activity.ChatMainAct"
-            android:launchMode="singleTop" />
-        <activity
             android:name="com.activity.ChatSingleAct"
             android:launchMode="standard" />
         <activity
-            android:name="com.activity.ChatAllAct"
-            android:launchMode="singleTop" />
-        <activity
             android:name="com.activity.ChatGroupAct"
-            android:launchMode="singleTop" />
+            android:launchMode="standard" />
         <activity
             android:name="com.activity.HomeActivity"
             android:launchMode="singleTop"

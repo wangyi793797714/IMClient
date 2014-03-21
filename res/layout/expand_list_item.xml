@@ -16,20 +16,20 @@
   		android:layout_width="wrap_content"
   		android:layout_height="40dp"
   		android:textSize="18sp"
-  		android:textColor="#519301"
+  		android:textColor="#0a59b4"
   	    android:gravity="center_vertical"
         android:layout_marginLeft="42dp"
-        />
-  	<Button
+        android:textStyle="bold"/>
+  	<ImageView
   	    android:id="@+id/expand_add_child"
   	    android:layout_width="wrap_content"
   	    android:layout_height="wrap_content"
-  	    android:text="开始聊天"
         android:clickable="true"
         android:focusable="false"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"/>
-    <Button
+        android:layout_marginRight="30dp"
+        android:background="@drawable/start_chat"/>
+    <TextView
         android:id="@+id/expand_tips"
         android:layout_width="30dp"
         android:layout_height="wrap_content"

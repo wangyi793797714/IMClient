@@ -26,12 +26,15 @@ import adapter.FragAdapter;
 import adapter.GroupChatAdapter;
 import adapter.MyExpandAdapter;
 import adapter.OnlineAdapter;
+import android.R.color;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -46,6 +49,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -344,8 +348,12 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
     }
 
     public void setListener(final int position) {
+        ImageView view =(ImageView) getActionBar().getCustomView();
+        Resources res = this.getResources();
         if (position == 0) {
-            getActionBar().getCustomView().setOnClickListener(new OnClickListener() {
+            Drawable myImage = res.getDrawable(R.drawable.add_friend_drawable);
+            view.setBackgroundDrawable(myImage);
+            view.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
@@ -365,7 +373,9 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                 }
             });
         } else if (position == 1) {
-            getActionBar().getCustomView().setOnClickListener(new OnClickListener() {
+            Drawable myImage = res.getDrawable(R.drawable.add_chatroom_drawable);
+            view.setBackgroundDrawable(myImage);
+            view.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
@@ -451,7 +461,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                 }
             });
         } else if (position == 2) {
-            getActionBar().getCustomView().setOnClickListener(new OnClickListener() {
+            view.setBackgroundColor(color.transparent);
+            view.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
@@ -459,7 +470,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                 }
             });
         } else {
-            getActionBar().getCustomView().setOnClickListener(new OnClickListener() {
+            view.setBackgroundColor(color.transparent);
+            view.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {

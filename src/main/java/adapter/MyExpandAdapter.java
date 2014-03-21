@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -91,7 +90,7 @@ public class MyExpandAdapter extends BaseExpandableListAdapter {
         }
         ImageView image = (ImageView) convertView.findViewById(R.id.expand_image);
         TextView title = (TextView) convertView.findViewById(R.id.expand_title);
-        Button btn = (Button) convertView.findViewById(R.id.expand_add_child);
+        ImageView btn = (ImageView) convertView.findViewById(R.id.expand_add_child);
         convertView.setTag(data.get(groupPosition).getGrouppTag());
         title.setText(data.get(groupPosition).getGroupName());
         image.setVisibility(View.INVISIBLE);
