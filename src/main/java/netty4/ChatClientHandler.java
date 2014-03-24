@@ -3,7 +3,6 @@ package netty4;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +12,13 @@ import vo.AddFriendResponse;
 import vo.ChatRoom;
 import vo.Content;
 import vo.FriendBody;
-import vo.Myself;
 import vo.Friends;
+import vo.Myself;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.activity.ChatGroupAct;
 import com.activity.ChatSingleAct;

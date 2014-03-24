@@ -13,8 +13,8 @@ import util.FileOperator;
 import util.Util;
 import vo.ChatRoom;
 import vo.Content;
-import vo.Myself;
 import vo.Friends;
+import vo.Myself;
 import vo.RoomChild;
 import widget.FirstFragment;
 import widget.FirstFragment.Regist;
@@ -100,9 +100,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
     private NotifiReceiver nReceiver = null;
     private SingleChatReceiver sReceiver = null;
 
+    /** 消息容器：key：用户编号 */
     public static Map<Integer, List<Content>> singleMsgs = new ConcurrentHashMap<Integer, List<Content>>();
 
-    // key:属于groupPosition
+    /** key:属于groupPosition */
     public static Map<Long, List<Content>> groupMsgs = new ConcurrentHashMap<Long, List<Content>>();
 
     private FinalDb db = null;
@@ -129,6 +130,9 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
         initViewData(0);
         initViewPage();
         initListener();
+        
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Const.ACTION_OFFLINE_MSG);
     }
 
     private void initCommonData() {
@@ -348,7 +352,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
     }
 
     public void setListener(final int position) {
-        ImageView view =(ImageView) getActionBar().getCustomView();
+        ImageView view = (ImageView) getActionBar().getCustomView();
         Resources res = this.getResources();
         if (position == 0) {
             Drawable myImage = res.getDrawable(R.drawable.add_friend_drawable);
@@ -466,7 +470,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(HomeActivity.this, position + "", 0).show();
+                    Toast.makeText(HomeActivity.this, position + "", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -475,7 +479,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(HomeActivity.this, 3 + "", 0).show();
+                    Toast.makeText(HomeActivity.this, 3 + "", Toast.LENGTH_SHORT).show();
                 }
             });
         }

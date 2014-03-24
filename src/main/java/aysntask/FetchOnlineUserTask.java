@@ -26,16 +26,17 @@ import org.springframework.web.client.RestTemplate;
 
 import util.FileOperator;
 import util.Util;
-import vo.Myself;
 import vo.Friends;
+import vo.Myself;
 import adapter.OnlineAdapter;
 import android.app.Activity;
+import android.content.Intent;
 import config.Const;
 
 public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
 
     public static Channel channel;
-    
+
     private EventLoopGroup group;
     private static Bootstrap bootStrap;
     private Activity act;
@@ -66,14 +67,18 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
                 }
             }
             adapter.addItems(arrayList);
-            FinalDb  db=FinalDb.create(act,FileOperator.getDbPath(act),true);
-            for (Myself u:arrayList) {
-                Friends on= new Friends();
+            FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
+            for (Myself u : arrayList) {
+                Friends on = new Friends();
                 on.setChannelId(u.getChannelId());
                 on.setName(u.getName());
                 on.setOnline(u.isOnline());
                 db.save(on);
             }
+            
+            Intent intent = new Intent();
+            intent.setAction(Const.ACTION_OFFLINE_MSG);
+            act.sendBroadcast(intent);
         }
     }
 
@@ -89,7 +94,7 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
             channel = bootStrap.connect(Const.NEETY_IP, Const.NETTY_PORT).sync().channel();
         } catch (Exception e) {
             if (e instanceof ConnectException) {
-                // toast("连接服务器失败");
+                toast(act, "连接服务器失败");
             }
             System.err.println(e.fillInStackTrace());
             return null;

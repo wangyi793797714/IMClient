@@ -18,10 +18,13 @@ import com.activity.HomeActivity;
 import com.activity.LoginAct;
 
 import util.FileOperator;
+import util.Util;
+import vo.Content;
+import vo.LoginSucsess;
 import vo.Myself;
 import config.Const;
 
-public class LoginTask extends BaseTask<Myself, Void, Myself> {
+public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
 
     private LoginAct act;
 
@@ -35,7 +38,7 @@ public class LoginTask extends BaseTask<Myself, Void, Myself> {
     }
 
     @Override
-    public Myself doExecute(Myself info) throws Exception {
+    public LoginSucsess doExecute(Myself info) throws Exception {
         final String url = Const.BASE_URL + "login?n=" + info.getChannelId() + "&" + "p="
                 + info.getPass();
         HttpHeaders reqtHeaders = new HttpHeaders();
@@ -47,8 +50,8 @@ public class LoginTask extends BaseTask<Myself, Void, Myself> {
 
         RestTemplate rest = new RestTemplate();
         rest.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        ResponseEntity<Myself> resp = rest.exchange(url, HttpMethod.GET, requestEntity,
-                Myself.class);
+        ResponseEntity<LoginSucsess> resp = rest.exchange(url, HttpMethod.GET, requestEntity,
+                LoginSucsess.class);
         if (resp.getStatusCode() == HttpStatus.OK) {
             return resp.getBody();
         }
@@ -56,15 +59,25 @@ public class LoginTask extends BaseTask<Myself, Void, Myself> {
     }
 
     @Override
-    public void doResult(Myself result) throws Exception {
+    public void doResult(LoginSucsess result) throws Exception {
         if (result != null) {
-            currentName = result.getName();
+            currentName = result.getMyself().getName();
             FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
-            db.save(result);
+            db.save(result.getMyself());
+            if (!Util.isEmpty(result.getOfflineMsgs())) {
+                for (Content offlineMsg : result.getOfflineMsgs()) {
+                    List<Content> msgs = HomeActivity.singleMsgs.get(offlineMsg.getSendId());
+                    if (Util.isEmpty(msgs)) {
+                        msgs = new ArrayList<Content>();
+                    }
+                    msgs.add(offlineMsg);
+                    HomeActivity.singleMsgs.put(offlineMsg.getSendId(), msgs);
+                }
+            }
             act.skip(HomeActivity.class, result);
             act.finish();
-        }else{
-            toast(act,"登陆失败,请检查输入信息");
+        } else {
+            toast(act, "登陆失败,请检查输入信息");
         }
     }
 }

@@ -1,6 +1,5 @@
 package aysntask;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,25 +12,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 
 import vo.FriendBody;
-import vo.RoomChild;
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
 import config.Const;
 
 public class AddFriendToRoomTask extends BaseTask<FriendBody, Void, String> {
 
-    private Activity act;
-
-    private List<RoomChild> tempList;
-
-    private int position;
-    
-    public AddFriendToRoomTask(Activity activity, List<RoomChild> tempList,int position) {
+    public AddFriendToRoomTask(Activity activity) {
         super(activity);
-        this.act = activity;
-        this.tempList = tempList;
-        this.position=position;
     }
 
     @Override
@@ -45,9 +32,8 @@ public class AddFriendToRoomTask extends BaseTask<FriendBody, Void, String> {
         HttpEntity<FriendBody> requestEntity = new HttpEntity<FriendBody>(fb, reqtHeaders);
         RestTemplate rest = new RestTemplate();
         rest.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        ResponseEntity<String> resp = rest.postForEntity(url,  requestEntity,
-                String.class);
-        
+        ResponseEntity<String> resp = rest.postForEntity(url, requestEntity, String.class);
+
         if (resp.getStatusCode() == HttpStatus.OK) {
             return "ok";
         }
@@ -56,12 +42,6 @@ public class AddFriendToRoomTask extends BaseTask<FriendBody, Void, String> {
 
     @Override
     public void doResult(String result) throws Exception {
-//        Intent intent = new Intent();
-//        intent.setAction(Const.ACTION_ADD_FRIENDTOCHAT);
-//        Bundle bund = new Bundle();
-//        bund.putSerializable("newFriend", (Serializable) tempList);
-//        bund.putInt("position", position);
-//        intent.putExtras(bund);
-//        act.sendBroadcast(intent);
+
     }
 }

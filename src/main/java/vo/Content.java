@@ -10,9 +10,9 @@ import net.tsz.afinal.annotation.sqlite.Table;
 @Table(name = "chat_content")
 public class Content implements Serializable {
 
-    /** 发送者名字 */
     private int id;
     
+    /** 发送者名字 */
     private String sendName;
 
     /** 接受人姓名 */

@@ -53,11 +53,11 @@ public class ChatSingleAct extends BaseActivity {
         if (Util.isEmpty(msgs)) {
             adapter = new ChatAdapter(new ArrayList<Content>(), activity);
         } else {
-            sendId=msgs.get(0).getSendId();
+            sendId = msgs.get(0).getSendId();
             adapter = new ChatAdapter(msgs, activity);
         }
         if (msg != null) {
-            sendId=msg.getSendId();
+            sendId = msg.getSendId();
             adapter.addItem(msg, 0);
             HomeActivity.singleMsgs.remove(vo.getChannelId());
             sendBroadcast(ChatSingleAct.this, msg);
@@ -88,7 +88,7 @@ public class ChatSingleAct extends BaseActivity {
                         content.setReceiveId(vo.getChannelId());
                     }
                 }
-                sendId=content.getReceiveId();
+                sendId = content.getReceiveId();
                 FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
                         new GenericFutureListener<Future<? super Void>>() {
                             @Override
@@ -120,7 +120,6 @@ public class ChatSingleAct extends BaseActivity {
                 chatList.setSelection(adapter.getCount() - 1);
             }
         }
-
     }
 
     public void registerBoradcastReceiver(BroadcastReceiver receiver) {

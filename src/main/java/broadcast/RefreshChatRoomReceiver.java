@@ -1,6 +1,5 @@
 package broadcast;
 
-import util.Util;
 import vo.FriendBody;
 import adapter.MyExpandAdapter;
 import android.content.BroadcastReceiver;

@@ -44,11 +44,11 @@ public class SingleChatReceiver extends BroadcastReceiver {
             }
             msgs.add(content);
             HomeActivity.singleMsgs.put(content.getSendId(), msgs);
-            List<Myself> onlineUsers = adapter.getDataSource();
-            for (int i = 0; i < onlineUsers.size(); i++) {
-                if (content.getSendId() == onlineUsers.get(i).getChannelId()) {
+            List<Myself> friendsList = adapter.getDataSource();
+            for (int i = 0; i < friendsList.size(); i++) {
+                if (content.getSendId() == friendsList.get(i).getChannelId()) {
                     if (HomeActivity.singleMsgs.get(content.getSendId()).size() > 0) {
-                        int position = adapter.getPosition(onlineUsers.get(i));
+                        int position = adapter.getPosition(friendsList.get(i));
                         RelativeLayout rl = (RelativeLayout) onlineList.getChildAt(position);
                         BadgeView tips = new BadgeView(act, rl.getChildAt(1));
                         tips.setText(HomeActivity.singleMsgs.get(content.getSendId()).size() + "");

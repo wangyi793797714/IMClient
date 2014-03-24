@@ -28,6 +28,9 @@ public interface Const {
     /** 收到私聊消息 */
     public static final String ACTION_SINGLE_MSG = "single_msg";
     
+    /**获取好友列表成功后，发送通知，显示好友发给用户的离线消息*/
+    public static final String ACTION_OFFLINE_MSG = "offline_msg";
+    
     /** 群里界面新增好友，通知主界面更新列表*/
     public static final String ACTION_ADD_FRIENDTOCHAT = "addFriend2chatRoom";
 

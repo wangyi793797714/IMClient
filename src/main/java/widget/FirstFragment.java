@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import application.IMApplication;
 import aysntask.FetchOnlineUserTask;
+import broadcast.OfflineMsgReceiver;
 import broadcast.ReponseAddFriendReceiver;
 import broadcast.ReqestAddFriendReceiver;
 
@@ -49,22 +50,23 @@ public class FirstFragment extends BaseFragment {
         activity = getActivity();
         FinalDb db = FinalDb.create(getActivity(), FileOperator.getDbPath(getActivity()), true);
         new FetchOnlineUserTask(activity, adapter).execute(db.findAll(Myself.class).get(0));
-
     }
 
     public void initBroadcast(boolean flag) {
         if (flag) {
             regist.registBroadcast(onlineList, adapter);
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Const.ACTION_ADDFRIEND_REQUEST);
+            IntentFilter filter = new IntentFilter(Const.ACTION_ADDFRIEND_REQUEST);
             ReqestAddFriendReceiver receiver = new ReqestAddFriendReceiver(getActivity());
             IMApplication.APP.reReceiver(receiver, filter);
 
-            IntentFilter filter2 = new IntentFilter();
-            filter2.addAction(Const.ACTION_ADDFRIEND_REPONSE);
+            IntentFilter filter2 = new IntentFilter(Const.ACTION_ADDFRIEND_REPONSE);
             ReponseAddFriendReceiver receiver2 = new ReponseAddFriendReceiver(getActivity(),
                     adapter);
             IMApplication.APP.reReceiver(receiver2, filter2);
+
+            IntentFilter filter3 = new IntentFilter(Const.ACTION_OFFLINE_MSG);
+            IMApplication.APP.registerReceiver(new OfflineMsgReceiver(adapter, onlineList,
+                    getActivity()), filter3);
 
             isFirst = false;
         }
