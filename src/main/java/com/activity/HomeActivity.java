@@ -116,6 +116,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
     protected void onCreate(Bundle arg0) {
         super.onCreate(arg0);
         setContentView(R.layout.layout_home);
+        IMApplication.APP.addActivity(this);
         getActionBar().setCustomView(R.layout.main_action_button);
         getActionBar().setDisplayShowCustomEnabled(true);
         db = FinalDb.create(this, FileOperator.getDbPath(this), true);
@@ -130,9 +131,6 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
         initViewData(0);
         initViewPage();
         initListener();
-        
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Const.ACTION_OFFLINE_MSG);
     }
 
     private void initCommonData() {
@@ -511,7 +509,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                                             }
                                         });
                             }
-                            finish();
+                            IMApplication.APP.finishAct();
                         }
                     }).show();
             return true;

@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import application.IMApplication;
 
 public class MainActivity extends FragmentActivity {
 
@@ -37,6 +38,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
+        IMApplication.APP.addActivity(this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the app.

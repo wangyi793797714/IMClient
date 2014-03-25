@@ -47,6 +47,7 @@ public class ChatSingleAct extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_detail);
+        IMApplication.APP.addActivity(this);
         final Myself vo = (Myself) getVo("0");
         final Content msg = (Content) getIntent().getExtras().getSerializable("3");
         final List<Content> msgs = (List<Content>) getVo("1");

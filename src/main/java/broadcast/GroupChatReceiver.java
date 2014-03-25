@@ -13,13 +13,13 @@ import com.activity.HomeActivity;
 
 import config.Const;
 
-public class TestGroupChatReceiver extends BroadcastReceiver {
+public class GroupChatReceiver extends BroadcastReceiver {
 
     private ExpandableListView exListView;
 
     private Activity act;
 
-    public TestGroupChatReceiver(Activity act, ExpandableListView exListView) {
+    public GroupChatReceiver(Activity act, ExpandableListView exListView) {
         this.exListView = exListView;
         this.act = act;
     }
@@ -28,12 +28,14 @@ public class TestGroupChatReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Const.ACTION_GROUP_MAIN.equals(intent.getAction())) {
             for (Long key : HomeActivity.groupMsgs.keySet()) {
-                RelativeLayout rl = (RelativeLayout) exListView.findViewWithTag(key);
-                rl.getChildAt(3).setVisibility(View.VISIBLE);
-                BadgeView tips = new BadgeView(act, rl.getChildAt(3));
-                tips.setText(HomeActivity.groupMsgs.get(key).size() + "");
-                tips.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
-                tips.toggle(null, null);
+                if(HomeActivity.groupMsgs.get(key).size()>0){
+                    RelativeLayout rl = (RelativeLayout) exListView.findViewWithTag(key);
+                    rl.getChildAt(3).setVisibility(View.VISIBLE);
+                    BadgeView tips = new BadgeView(act, rl.getChildAt(3));
+                    tips.setText(HomeActivity.groupMsgs.get(key).size() + "");
+                    tips.setBadgePosition(BadgeView.POSITION_TOP_RIGHT);
+                    tips.toggle(null, null);
+                }
             }
         }
     }

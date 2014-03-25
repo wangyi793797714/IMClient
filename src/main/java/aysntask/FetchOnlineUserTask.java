@@ -79,6 +79,10 @@ public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
             Intent intent = new Intent();
             intent.setAction(Const.ACTION_OFFLINE_MSG);
             act.sendBroadcast(intent);
+            
+            Intent intent2 = new Intent();
+            intent2.setAction(Const.ACTION_GROUP_OFFLINE_MSG);
+            act.sendBroadcast(intent2);
         }
     }
 

@@ -7,6 +7,9 @@ public interface Const {
     /** 群聊广播:在主界面 */
     public static final String ACTION_GROUP_MAIN = "group_main";
 
+    /**离线群组消息*/
+    public static final String ACTION_GROUP_OFFLINE_MSG = "group_offline_msg";
+
     /** 群聊广播:在聊天界面 */
     public static final String ACTION_GROUP_CHAT = "group_chat";
 
@@ -34,7 +37,6 @@ public interface Const {
     /** 群里界面新增好友，通知主界面更新列表*/
     public static final String ACTION_ADD_FRIENDTOCHAT = "addFriend2chatRoom";
 
-    
     public static final String BASE_URL = "http://192.168.1.84:8080/IMServer/api/";
 
     public static final String DB_FOLDER_NAME = "IM";

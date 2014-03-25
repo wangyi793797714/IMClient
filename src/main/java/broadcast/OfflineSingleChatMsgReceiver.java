@@ -16,7 +16,7 @@ import com.activity.HomeActivity;
 
 import config.Const;
 
-public class OfflineMsgReceiver extends BroadcastReceiver {
+public class OfflineSingleChatMsgReceiver extends BroadcastReceiver {
 
     private OnlineAdapter adapter;
 
@@ -24,7 +24,7 @@ public class OfflineMsgReceiver extends BroadcastReceiver {
 
     private Activity act;
 
-    public OfflineMsgReceiver(OnlineAdapter adapter, ListView onlineList, Activity act) {
+    public OfflineSingleChatMsgReceiver(OnlineAdapter adapter, ListView onlineList, Activity act) {
         this.adapter = adapter;
         this.onlineList = onlineList;
         this.act = act;

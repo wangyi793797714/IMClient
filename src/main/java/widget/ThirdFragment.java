@@ -21,9 +21,10 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.RelativeLayout;
 import application.IMApplication;
+import broadcast.GroupChatReceiver;
+import broadcast.OfflineGroupChatReceiver;
 import broadcast.RefreshChatRoomReceiver;
 import broadcast.ReqestCreateChatRoomReceiver;
-import broadcast.TestGroupChatReceiver;
 
 import com.activity.HomeActivity;
 import com.activity.R;
@@ -40,6 +41,8 @@ public class ThirdFragment extends BaseFragment {
     private int sign = -1;
 
     private createRoom create;
+
+    private boolean isFirst = true;
 
     @Override
     public void onAttach(Activity activity) {
@@ -76,7 +79,7 @@ public class ThirdFragment extends BaseFragment {
         exListView = (ExpandableListView) view.findViewById(R.id.chat_room_list);
         IntentFilter Filter2 = new IntentFilter();
         Filter2.addAction(Const.ACTION_GROUP_MAIN);
-        TestGroupChatReceiver receiver = new TestGroupChatReceiver(getActivity(), exListView);
+        GroupChatReceiver receiver = new GroupChatReceiver(getActivity(), exListView);
         IMApplication.APP.reReceiver(receiver, Filter2);
         exListView.setAdapter(adapter);
         exListView.setOnChildClickListener(new OnChildClickListener() {
@@ -127,8 +130,19 @@ public class ThirdFragment extends BaseFragment {
                 }
             }
         });
-
+        initBroadcast(isFirst);
         return view;
+    }
+
+    public void initBroadcast(boolean flag) {
+        if (flag) {
+            IntentFilter Filter3 = new IntentFilter();
+            Filter3.addAction(Const.ACTION_GROUP_OFFLINE_MSG);
+            OfflineGroupChatReceiver receiver3 = new OfflineGroupChatReceiver(getActivity(),
+                    exListView);
+            IMApplication.APP.reReceiver(receiver3, Filter3);
+            isFirst = false;
+        }
     }
 
     @Override
@@ -136,6 +150,9 @@ public class ThirdFragment extends BaseFragment {
         super.onResume();
         for (Long key : HomeActivity.groupMsgs.keySet()) {
             RelativeLayout rl = (RelativeLayout) exListView.findViewWithTag(key);
+            if (rl == null) {
+                return;
+            }
             BadgeView tips = new BadgeView(getActivity(), rl.getChildAt(3));
             if (Util.isEmpty(HomeActivity.groupMsgs.get(key))) {
                 rl.getChildAt(3).setVisibility(View.INVISIBLE);

@@ -66,16 +66,26 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
             db.save(result.getMyself());
             if (!Util.isEmpty(result.getOfflineMsgs())) {
                 for (Content offlineMsg : result.getOfflineMsgs()) {
-                    List<Content> msgs = HomeActivity.singleMsgs.get(offlineMsg.getSendId());
-                    if (Util.isEmpty(msgs)) {
-                        msgs = new ArrayList<Content>();
+                    // 说明是群组发来的离线消息
+                    if (offlineMsg.getGrouppTag() != 0) {
+                        List<Content> msgs = HomeActivity.groupMsgs.get(offlineMsg.getGrouppTag());
+                        if (Util.isEmpty(msgs)) {
+                            msgs = new ArrayList<Content>();
+                        }
+                        msgs.add(offlineMsg);
+                        HomeActivity.groupMsgs.put(offlineMsg.getGrouppTag(), msgs);
+                    } else {
+                        // 私聊的离线消息
+                        List<Content> msgs = HomeActivity.singleMsgs.get(offlineMsg.getSendId());
+                        if (Util.isEmpty(msgs)) {
+                            msgs = new ArrayList<Content>();
+                        }
+                        msgs.add(offlineMsg);
+                        HomeActivity.singleMsgs.put(offlineMsg.getSendId(), msgs);
                     }
-                    msgs.add(offlineMsg);
-                    HomeActivity.singleMsgs.put(offlineMsg.getSendId(), msgs);
                 }
             }
             act.skip(HomeActivity.class, result);
-            act.finish();
         } else {
             toast(act, "登陆失败,请检查输入信息");
         }

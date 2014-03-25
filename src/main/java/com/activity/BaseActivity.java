@@ -2,9 +2,9 @@ package com.activity;
 
 import java.io.Serializable;
 
-import util.FileOperator;
 import net.tsz.afinal.FinalActivity;
 import net.tsz.afinal.FinalDb;
+import util.FileOperator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+import application.IMApplication;
 
 public class BaseActivity extends FinalActivity {
 
@@ -23,8 +24,10 @@ public class BaseActivity extends FinalActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (db == null) {
-            db=FinalDb.create(this,FileOperator.getDbPath(this),true);
+            db = FinalDb.create(this, FileOperator.getDbPath(this), true);
         }
+        IMApplication app = (IMApplication) getApplication();
+        IMApplication.set(app);
     }
 
     @Override

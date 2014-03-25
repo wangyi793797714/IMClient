@@ -33,14 +33,11 @@ public class LoginAct extends BaseActivity {
     @ViewInject(id = R.id.login_register)
     private Button register;
 
-    public IMApplication app;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = (IMApplication) getApplication();
-        IMApplication.set(app);
         setContentView(R.layout.layout_login);
+        IMApplication.APP.addActivity(this);
         login = (Button) findViewById(R.id.login_login);
         List<Myself> list = db.findAll(Myself.class);
         if (!Util.isEmpty(list)) {

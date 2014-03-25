@@ -67,6 +67,7 @@ public class ChatGroupAct extends BaseActivity {
             HomeActivity.groupMsgs.get((((ChatRoom) getVo("0")).getGrouppTag())).clear();
         }
         setContentView(R.layout.group_chat);
+        IMApplication.APP.addActivity(this);
         initView();
         registerBoradcastReceiver(new msgBroadcastReceiver());
         final ChatRoom room = ((ChatRoom) getVo("0"));

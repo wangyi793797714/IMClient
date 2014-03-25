@@ -58,7 +58,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
             ActivityManager am = (ActivityManager) act.getSystemService(Context.ACTIVITY_SERVICE);
             ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
             // 私聊消息
-            if (content.getReceiveId() != 0) {
+            if (content.getGrouppTag() == 0) {
                 if (cn.getClassName().equals("com.activity.ChatSingleAct")) {
                     if (content.getSendId() == ChatSingleAct.sendId) {
                         intent.setAction(Const.ACTION_SINGLE_BROADCAST);

@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import application.IMApplication;
 import aysntask.FetchOnlineUserTask;
-import broadcast.OfflineMsgReceiver;
+import broadcast.OfflineSingleChatMsgReceiver;
 import broadcast.ReponseAddFriendReceiver;
 import broadcast.ReqestAddFriendReceiver;
 
@@ -65,7 +65,7 @@ public class FirstFragment extends BaseFragment {
             IMApplication.APP.reReceiver(receiver2, filter2);
 
             IntentFilter filter3 = new IntentFilter(Const.ACTION_OFFLINE_MSG);
-            IMApplication.APP.registerReceiver(new OfflineMsgReceiver(adapter, onlineList,
+            IMApplication.APP.registerReceiver(new OfflineSingleChatMsgReceiver(adapter, onlineList,
                     getActivity()), filter3);
 
             isFirst = false;
