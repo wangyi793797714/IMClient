@@ -57,18 +57,23 @@ public class ChatSingleAct extends BaseActivity {
         db = FinalDb.create(getActivity(), FileOperator.getDbPath(getActivity()), true);
 
         // 由通知栏传入
-        final Myself vo = (Myself) getVo("0");
-        sendId=vo.getChannelId();
         final Content msg = (Content) getIntent().getExtras().getSerializable("3");
-
         // 由主界面传入
+        final Myself vo = (Myself) getVo("0");
+        sendId = vo.getChannelId();
+
         final List<Content> msgs = (List<Content>) getVo("1");
 
         adapter = new ChatAdapter(new ArrayList<Content>(), activity);
-        //获取最近10条消息
-        List<Content> lastMsgs = db.findAll(Content.class,"date DESC LIMIT 10");
-        Collections.sort(lastMsgs, new MsgComparator());
-        adapter.addItems(lastMsgs, 0);
+        // 获取最近10条消息
+        String key1 = sendId +""+ db.findAll(Myself.class).get(0).getChannelId();
+        String key2 = db.findAll(Myself.class).get(0).getChannelId()+""+ sendId;
+        List<Content> lastMsgs = db.findAllByWhere(Content.class, "belongTo = '" + key1
+                + "' or belongTo = '" + key2+"'", "date DESC LIMIT 10");
+        if (!Util.isEmpty(lastMsgs)) {
+            Collections.sort(lastMsgs, new MsgComparator());
+            adapter.addItems(lastMsgs, 0);
+        }
         if (!Util.isEmpty(msgs)) {
             sendId = msgs.get(0).getSendId();
             adapter.addItems(msgs);
@@ -90,6 +95,8 @@ public class ChatSingleAct extends BaseActivity {
             @Override
             public void onClick(View v) {
                 final Content content = new Content();
+                content.setBelongTo(vo.getChannelId()+""+
+                        + db.findAll(Myself.class).get(0).getChannelId());
                 content.setDate(new Date());
                 content.setMsg(input.getText().toString());
                 input.setText("");
