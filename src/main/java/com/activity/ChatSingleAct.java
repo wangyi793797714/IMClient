@@ -4,10 +4,14 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.view.ViewInject;
+import util.FileOperator;
+import util.MsgComparator;
 import util.Util;
 import vo.Content;
 import vo.Myself;
@@ -42,24 +46,40 @@ public class ChatSingleAct extends BaseActivity {
 
     public static int sendId = -1;
 
+    private FinalDb db;
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_detail);
         IMApplication.APP.addActivity(this);
+        db = FinalDb.create(getActivity(), FileOperator.getDbPath(getActivity()), true);
+
+        // 由通知栏传入
         final Myself vo = (Myself) getVo("0");
+        sendId=vo.getChannelId();
         final Content msg = (Content) getIntent().getExtras().getSerializable("3");
+
+        // 由主界面传入
         final List<Content> msgs = (List<Content>) getVo("1");
-        if (Util.isEmpty(msgs)) {
-            adapter = new ChatAdapter(new ArrayList<Content>(), activity);
-        } else {
+
+        adapter = new ChatAdapter(new ArrayList<Content>(), activity);
+        //获取最近10条消息
+        List<Content> lastMsgs = db.findAll(Content.class,"date DESC LIMIT 10");
+        Collections.sort(lastMsgs, new MsgComparator());
+        adapter.addItems(lastMsgs, 0);
+        if (!Util.isEmpty(msgs)) {
             sendId = msgs.get(0).getSendId();
-            adapter = new ChatAdapter(msgs, activity);
+            adapter.addItems(msgs);
+            for (Content content : msgs) {
+                db.save(content);
+            }
         }
         if (msg != null) {
             sendId = msg.getSendId();
             adapter.addItem(msg, 0);
+            db.save(msg);
             HomeActivity.singleMsgs.remove(vo.getChannelId());
             sendBroadcast(ChatSingleAct.this, msg);
         }
@@ -102,6 +122,7 @@ public class ChatSingleAct extends BaseActivity {
                                         public void run() {
                                             adapter.addItem(content, adapter.getCount());
                                             chatList.setSelection(adapter.getCount() - 1);
+                                            db.save(content);
                                         }
                                     });
                                 }
@@ -111,6 +132,11 @@ public class ChatSingleAct extends BaseActivity {
         });
     }
 
+    /**
+     * 
+     * @desc
+     * @author WY 创建时间 2014年4月3日 下午2:07:59
+     */
     class msgBroadcastReceiver extends BroadcastReceiver {
 
         @Override

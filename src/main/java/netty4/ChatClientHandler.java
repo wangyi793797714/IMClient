@@ -6,6 +6,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tsz.afinal.FinalDb;
+import util.FileOperator;
 import util.NotificationUtil;
 import vo.AddFriendRequest;
 import vo.AddFriendResponse;
@@ -62,6 +64,8 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                 if (cn.getClassName().equals("com.activity.ChatSingleAct")) {
                     if (content.getSendId() == ChatSingleAct.sendId) {
                         intent.setAction(Const.ACTION_SINGLE_BROADCAST);
+                        FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
+                        db.save(content);
                     } else {
                         // 构造一个user
                         Myself u = new Myself();
