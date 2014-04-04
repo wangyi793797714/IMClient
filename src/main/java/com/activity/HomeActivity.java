@@ -495,6 +495,17 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                             IMApplication.APP.closeReceiver();
                             // TODO
                             db.deleteAll(Friends.class);
+                            
+                            //保存未读消息
+                            for(Integer key:singleMsgs.keySet()){
+                                List<Content> unReadMsgs= singleMsgs.get(key);
+                                if(!Util.isEmpty(unReadMsgs)){
+                                    for(Content unReadMsg:unReadMsgs){
+                                        db.save(unReadMsg);
+                                    }
+                                }
+                            }
+                            
                             if (FetchOnlineUserTask.channel != null) {
                                 Friends myInfo = new Friends();
                                 myInfo.setChannelId(db.findAll(Myself.class).get(0).getChannelId());

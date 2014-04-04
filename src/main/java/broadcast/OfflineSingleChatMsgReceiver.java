@@ -34,7 +34,7 @@ public class OfflineSingleChatMsgReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Const.ACTION_OFFLINE_MSG.equals(intent.getAction())) {
             List<Myself> friendsList = adapter.getDataSource();
-            //此时，消息容器中的消息记录全部是服务器返回的离线消息
+            //此时，消息容器中的消息记录全部是服务器返回的离线消息和本地未读消息
             for (Integer key : HomeActivity.singleMsgs.keySet()) {
                 for (int i = 0; i < friendsList.size(); i++) {
                     if (key == friendsList.get(i).getChannelId()) {

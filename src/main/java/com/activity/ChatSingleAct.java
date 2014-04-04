@@ -78,12 +78,14 @@ public class ChatSingleAct extends BaseActivity {
             sendId = msgs.get(0).getSendId();
             adapter.addItems(msgs);
             for (Content content : msgs) {
+                content.setIsRead("true");
                 db.save(content);
             }
         }
         if (msg != null) {
             sendId = msg.getSendId();
             adapter.addItem(msg, 0);
+            msg.setIsRead("true");
             db.save(msg);
             HomeActivity.singleMsgs.remove(vo.getChannelId());
             sendBroadcast(ChatSingleAct.this, msg);
@@ -129,6 +131,7 @@ public class ChatSingleAct extends BaseActivity {
                                         public void run() {
                                             adapter.addItem(content, adapter.getCount());
                                             chatList.setSelection(adapter.getCount() - 1);
+                                            content.setIsRead("true");
                                             db.save(content);
                                         }
                                     });

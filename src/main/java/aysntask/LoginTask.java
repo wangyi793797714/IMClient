@@ -84,6 +84,18 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
                         HomeActivity.singleMsgs.put(offlineMsg.getSendId(), msgs);
                     }
                 }
+                
+            }
+            List<Content> unReadLoaclMsgs =db.findAllByWhere(Content.class, "isRead = 'false' ");
+            if(!Util.isEmpty(unReadLoaclMsgs)){
+                for(Content content:unReadLoaclMsgs){
+                    List<Content> msgs = HomeActivity.singleMsgs.get(content.getSendId());
+                    if (Util.isEmpty(msgs)) {
+                        msgs = new ArrayList<Content>();
+                    }
+                    msgs.add(content);
+                    HomeActivity.singleMsgs.put(content.getSendId(), msgs);
+                }
             }
             act.skip(HomeActivity.class, result);
         } else {
