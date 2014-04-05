@@ -501,7 +501,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
                                 List<Content> unReadMsgs= singleMsgs.get(key);
                                 if(!Util.isEmpty(unReadMsgs)){
                                     for(Content unReadMsg:unReadMsgs){
-                                        db.save(unReadMsg);
+                                    	if("false".equals(unReadMsg.getIsLocalMsg())){
+                                    		unReadMsg.setIsRead("false");
+                                    		unReadMsg.setIsLocalMsg("true");
+                                    		db.save(unReadMsg);
+                                    	}
                                     }
                                 }
                             }

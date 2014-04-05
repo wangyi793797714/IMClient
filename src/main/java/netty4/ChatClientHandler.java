@@ -66,6 +66,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                         intent.setAction(Const.ACTION_SINGLE_BROADCAST);
                         FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
                         content.setIsRead("true");
+                        content.setIsLocalMsg("true");
                         db.save(content);
                     } else {
                         // 构造一个user

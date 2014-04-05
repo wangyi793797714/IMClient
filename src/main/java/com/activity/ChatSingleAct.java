@@ -62,30 +62,44 @@ public class ChatSingleAct extends BaseActivity {
         final Myself vo = (Myself) getVo("0");
         sendId = vo.getChannelId();
 
+        //包含网络未读消息和本地未读消息（本地未读消息数据库中已经存在）
         final List<Content> msgs = (List<Content>) getVo("1");
 
         adapter = new ChatAdapter(new ArrayList<Content>(), activity);
-        // 获取最近10条消息
+     // 获取最近10条已读消息
         String key1 = sendId +""+ db.findAll(Myself.class).get(0).getChannelId();
         String key2 = db.findAll(Myself.class).get(0).getChannelId()+""+ sendId;
-        List<Content> lastMsgs = db.findAllByWhere(Content.class, "belongTo = '" + key1
-                + "' or belongTo = '" + key2+"'", "date DESC LIMIT 10");
+        List<Content> lastMsgs = db.findAllByWhere(Content.class, " isRead = 'true' and belongTo = '" + key1
+                + "' or belongTo = '" + key2+"' ", "date DESC LIMIT 10 ");
+        List<Content> tempDatas= new ArrayList<Content>(); 
         if (!Util.isEmpty(lastMsgs)) {
-            Collections.sort(lastMsgs, new MsgComparator());
-            adapter.addItems(lastMsgs, 0);
+            tempDatas.addAll(lastMsgs);
         }
         if (!Util.isEmpty(msgs)) {
             sendId = msgs.get(0).getSendId();
-            adapter.addItems(msgs);
             for (Content content : msgs) {
-                content.setIsRead("true");
-                db.save(content);
+            	if("false".equals(content.getIsLocalMsg())){
+            		//网络离线消息设置为本地并且为已读
+            		content.setIsRead("true");
+            		content.setIsLocalMsg("true");
+            		db.save(content);
+            		tempDatas.add(content);
+            	}else{
+            		//本地已经存在的未读消息，修改为已读
+            		content.setIsRead("true");
+            		content.setIsLocalMsg("true");
+            		db.update(content);
+            	}
             }
         }
+        
+        Collections.sort(tempDatas, new MsgComparator());
+        adapter.addItems(tempDatas);
         if (msg != null) {
             sendId = msg.getSendId();
             adapter.addItem(msg, 0);
             msg.setIsRead("true");
+            msg.setIsLocalMsg("true");
             db.save(msg);
             HomeActivity.singleMsgs.remove(vo.getChannelId());
             sendBroadcast(ChatSingleAct.this, msg);
@@ -132,6 +146,7 @@ public class ChatSingleAct extends BaseActivity {
                                             adapter.addItem(content, adapter.getCount());
                                             chatList.setSelection(adapter.getCount() - 1);
                                             content.setIsRead("true");
+                                            content.setIsLocalMsg("true");
                                             db.save(content);
                                         }
                                     });

@@ -93,6 +93,7 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
                     if (Util.isEmpty(msgs)) {
                         msgs = new ArrayList<Content>();
                     }
+                    content.setIsLocalMsg("true");
                     msgs.add(content);
                     HomeActivity.singleMsgs.put(content.getSendId(), msgs);
                 }
