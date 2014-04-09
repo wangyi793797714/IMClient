@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -29,12 +30,18 @@ import android.widget.ListView;
 import application.IMApplication;
 import aysntask.FetchOnlineUserTask;
 import aysntask.LoginTask;
+import aysntask.ShowLast10MsgsTask;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import config.Const;
 
 public class ChatSingleAct extends BaseActivity {
 
     @ViewInject(id = R.id.lv_chat_detail)
-    private ListView chatList;
+    private PullToRefreshListView chatList;
 
     @ViewInject(id = R.id.send)
     private Button sendBtn;
@@ -62,37 +69,38 @@ public class ChatSingleAct extends BaseActivity {
         final Myself vo = (Myself) getVo("0");
         sendId = vo.getChannelId();
 
-        //包含网络未读消息和本地未读消息（本地未读消息数据库中已经存在）
+        // 包含网络未读消息和本地未读消息（本地未读消息数据库中已经存在）
         final List<Content> msgs = (List<Content>) getVo("1");
 
         adapter = new ChatAdapter(new ArrayList<Content>(), activity);
-     // 获取最近10条已读消息
-        String key1 = sendId +""+ db.findAll(Myself.class).get(0).getChannelId();
-        String key2 = db.findAll(Myself.class).get(0).getChannelId()+""+ sendId;
-        List<Content> lastMsgs = db.findAllByWhere(Content.class, " isRead = 'true' and belongTo = '" + key1
-                + "' or belongTo = '" + key2+"' ", "date DESC LIMIT 10 ");
-        List<Content> tempDatas= new ArrayList<Content>(); 
+        // 获取最近10条已读消息
+        String key1 = sendId + "" + db.findAll(Myself.class).get(0).getChannelId();
+        String key2 = db.findAll(Myself.class).get(0).getChannelId() + "" + sendId;
+        final String sqlSplit = " belongTo = '" + key1 + "' or belongTo = '" + key2 + "' ";
+        List<Content> lastMsgs = db.findAllByWhere(Content.class, " isRead = 'true' and "
+                + sqlSplit, "date DESC LIMIT 10 ");
+        List<Content> tempDatas = new ArrayList<Content>();
         if (!Util.isEmpty(lastMsgs)) {
             tempDatas.addAll(lastMsgs);
         }
         if (!Util.isEmpty(msgs)) {
             sendId = msgs.get(0).getSendId();
             for (Content content : msgs) {
-            	if("false".equals(content.getIsLocalMsg())){
-            		//网络离线消息设置为本地并且为已读
-            		content.setIsRead("true");
-            		content.setIsLocalMsg("true");
-            		db.save(content);
-            		tempDatas.add(content);
-            	}else{
-            		//本地已经存在的未读消息，修改为已读
-            		content.setIsRead("true");
-            		content.setIsLocalMsg("true");
-            		db.update(content);
-            	}
+                if ("false".equals(content.getIsLocalMsg())) {
+                    // 网络离线消息设置为本地并且为已读
+                    content.setIsRead("true");
+                    content.setIsLocalMsg("true");
+                    db.save(content);
+                    tempDatas.add(content);
+                } else {
+                    // 本地已经存在的未读消息，修改为已读
+                    content.setIsRead("true");
+                    content.setIsLocalMsg("true");
+                    db.update(content);
+                }
             }
         }
-        
+
         Collections.sort(tempDatas, new MsgComparator());
         adapter.addItems(tempDatas);
         if (msg != null) {
@@ -111,8 +119,8 @@ public class ChatSingleAct extends BaseActivity {
             @Override
             public void onClick(View v) {
                 final Content content = new Content();
-                content.setBelongTo(vo.getChannelId()+""+
-                        + db.findAll(Myself.class).get(0).getChannelId());
+                content.setBelongTo(vo.getChannelId() + ""
+                        + +db.findAll(Myself.class).get(0).getChannelId());
                 content.setDate(new Date());
                 content.setMsg(input.getText().toString());
                 input.setText("");
@@ -144,7 +152,6 @@ public class ChatSingleAct extends BaseActivity {
                                         @Override
                                         public void run() {
                                             adapter.addItem(content, adapter.getCount());
-                                            chatList.setSelection(adapter.getCount() - 1);
                                             content.setIsRead("true");
                                             content.setIsLocalMsg("true");
                                             db.save(content);
@@ -153,6 +160,21 @@ public class ChatSingleAct extends BaseActivity {
                                 }
                             }
                         });
+            }
+        });
+
+        // select * from users order by id limit 10 offset 0
+        // offset代表从第几条记录“之后“开始查询，limit表明查询多少条结果
+
+        chatList.setOnRefreshListener(new OnRefreshListener<ListView>() {
+
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> arg0) {
+                String label = DateUtils.formatDateTime(getApplicationContext(),
+                        System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
+                                | DateUtils.FORMAT_ABBREV_ALL);
+                chatList.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                new ShowLast10MsgsTask(activity, chatList, adapter).execute(sqlSplit);
             }
         });
     }
@@ -169,7 +191,6 @@ public class ChatSingleAct extends BaseActivity {
             if (Const.ACTION_SINGLE_BROADCAST.equals(intent.getAction())) {
                 Content content = (Content) intent.getSerializableExtra("msg");
                 adapter.addItem(content, adapter.getCount());
-                chatList.setSelection(adapter.getCount() - 1);
             }
         }
     }

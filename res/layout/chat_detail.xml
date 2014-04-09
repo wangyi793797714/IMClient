@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-     >
-    <ListView 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <com.handmark.pulltorefresh.library.PullToRefreshListView
         android:id="@+id/lv_chat_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginBottom="40dp"
-        android:stackFromBottom="true" 
-        android:transcriptMode="alwaysScroll" 
         android:background="@drawable/list_view_bg"
-        />
-    <EditText 
+        android:cacheColorHint="#00000000"
+        android:divider="#19000000"
+        android:dividerHeight="2dp"
+        android:fadingEdge="none"
+        android:fastScrollEnabled="false"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"
+         />
+    <EditText
         android:id="@+id/content"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="50dp"
-        />
-    <Button 
+        android:layout_marginRight="50dp" />
+
+    <Button
         android:id="@+id/send"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="发送" />
+
 </RelativeLayout>
