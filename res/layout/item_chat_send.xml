@@ -10,7 +10,6 @@
         android:layout_height="40dp"
         android:textSize="15sp"
         android:textColor="#0000ff"
-        android:text="测试"
         android:gravity="center_vertical"
         android:layout_alignParentRight="true"
         />
@@ -21,8 +20,14 @@
         android:textSize="15sp"
         android:textColor="#ff0000"
         android:minHeight="40dp"
-        android:text="打发打发打发放大法阿发阿道夫阿道夫阿发放大啊"
         android:gravity="center_vertical"
         android:layout_toLeftOf="@id/sender_name"
+        />
+    <ImageView 
+        android:id="@+id/sender_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/sender_name"
+        android:visibility="gone" 
         />
 </RelativeLayout>

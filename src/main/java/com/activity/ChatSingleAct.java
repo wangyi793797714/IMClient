@@ -3,6 +3,7 @@ package com.activity;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -20,8 +21,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.Base64;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -143,6 +147,14 @@ public class ChatSingleAct extends BaseActivity {
                     }
                 }
                 sendId = content.getReceiveId();
+                
+                Bitmap bit =BitmapFactory.decodeResource(getResources(), R.drawable.loading_07);
+                
+                ByteArrayOutputStream  bos = new ByteArrayOutputStream();
+                bit.compress(Bitmap.CompressFormat.PNG, 90, bos);
+                byte[] src=bos.toByteArray();
+                String imageString = Base64.encodeToString(src,Base64.DEFAULT);
+                content.setImageSrc(imageString);
                 FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
                         new GenericFutureListener<Future<? super Void>>() {
                             @Override

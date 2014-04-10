@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.tsz.afinal.annotation.sqlite.Table;
+import net.tsz.afinal.annotation.sqlite.Transient;
 
 @SuppressWarnings("serial")
 @Table(name = "chat_content")
@@ -48,6 +49,9 @@ public class Content implements Serializable {
 	/**标示当前消息是否在本地已经存在*/
 	private String isLocalMsg = "false";
 
+	@Transient
+	private String imageSrc;
+	
 	public Date getDate() {
 		return date;
 	}
@@ -151,4 +155,13 @@ public class Content implements Serializable {
 	public void setIsLocalMsg(String isLocalMsg) {
 		this.isLocalMsg = isLocalMsg;
 	}
+
+	public String getImageSrc() {
+		return imageSrc;
+	}
+
+	public void setImageSrc(String imageSrc) {
+		this.imageSrc = imageSrc;
+	}
+	
 }
