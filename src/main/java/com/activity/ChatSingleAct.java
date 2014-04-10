@@ -33,6 +33,7 @@ import aysntask.LoginTask;
 import aysntask.ShowLast10MsgsTask;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -113,6 +114,7 @@ public class ChatSingleAct extends BaseActivity {
             sendBroadcast(ChatSingleAct.this, msg);
         }
         chatList.setAdapter(adapter);
+        chatList.setMode(Mode.PULL_FROM_START);
         registerBoradcastReceiver(new msgBroadcastReceiver());
         sendBtn.setOnClickListener(new OnClickListener() {
 
@@ -155,6 +157,7 @@ public class ChatSingleAct extends BaseActivity {
                                             content.setIsRead("true");
                                             content.setIsLocalMsg("true");
                                             db.save(content);
+                                            chatList.setSelection(adapter.getCount()-1);
                                         }
                                     });
                                 }
@@ -191,6 +194,7 @@ public class ChatSingleAct extends BaseActivity {
             if (Const.ACTION_SINGLE_BROADCAST.equals(intent.getAction())) {
                 Content content = (Content) intent.getSerializableExtra("msg");
                 adapter.addItem(content, adapter.getCount());
+                chatList.setSelection(adapter.getCount()-1);
             }
         }
     }

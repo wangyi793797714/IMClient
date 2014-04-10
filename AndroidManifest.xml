@@ -30,7 +30,8 @@
         </activity>
         <activity
             android:name="com.activity.ChatSingleAct"
-            android:launchMode="standard" />
+            android:launchMode="standard"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.activity.ChatGroupAct"
             android:launchMode="standard" />

@@ -14,8 +14,10 @@
         android:dividerHeight="2dp"
         android:fadingEdge="none"
         android:fastScrollEnabled="false"
-        android:footerDividersEnabled="false"
-        android:headerDividersEnabled="false"
+        android:footerDividersEnabled="true"
+        android:headerDividersEnabled="true"
+        android:transcriptMode="normal"  
+        android:stackFromBottom="true"
          />
     <EditText
         android:id="@+id/content"
