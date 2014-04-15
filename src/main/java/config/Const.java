@@ -37,13 +37,17 @@ public interface Const {
     /** 群里界面新增好友，通知主界面更新列表*/
     public static final String ACTION_ADD_FRIENDTOCHAT = "addFriend2chatRoom";
 
-    public static final String BASE_URL = "http://192.168.1.84:8080/IMServer/api/";
+//    public static final String BASE_URL = "http://192.168.1.84:8080/IMServer/api/";
+    public static final String BASE_URL = "http://192.168.1.8:8080/IMServer/api/";
 
     public static final String DB_FOLDER_NAME = "IM";
 
     public static final String DB__NAME = "IM.db";
+    
+    public static final String LOCAL__IMAGE_FOLDER = "IMImage";
 
-    public static final String NEETY_IP = "192.168.1.84";
+//    public static final String NEETY_IP = "192.168.1.84";
+    public static final String NEETY_IP = "192.168.1.8";
 
     public static final int NETTY_PORT = 9527;
 }

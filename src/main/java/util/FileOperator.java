@@ -1,10 +1,13 @@
 package util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import config.Const;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.text.TextUtils;
 
@@ -62,4 +65,23 @@ public class FileOperator {
                 + File.separator;
         return folderPath+Const.DB__NAME;
     }
+    
+    public static String getLocalImageFolderPath(Context context){
+    	 String folderPath = FileOperator.getPath(context) + File.separator + Const.LOCAL__IMAGE_FOLDER
+                 + File.separator;
+         return folderPath;
+    }
+    
+    public static void saveImage2Sd(Context context,Bitmap bm, String fileName) {
+		try {
+			File myCaptureFile = new File(getLocalImageFolderPath(context) + fileName);
+			BufferedOutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(myCaptureFile));
+			bm.compress(Bitmap.CompressFormat.PNG, 100, bos);
+			bos.flush();
+			bos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

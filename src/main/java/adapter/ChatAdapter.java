@@ -1,12 +1,10 @@
 package adapter;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.springframework.util.support.Base64;
-
+import util.FileOperator;
 import vo.Content;
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
@@ -22,8 +20,11 @@ public class ChatAdapter extends SimpleAdapter<Content> {
 
 	private int SEND_MSG = 1;
 
-	public ChatAdapter(List<Content> data, Context activity) {
+	private Activity act;
+	
+	public ChatAdapter(List<Content> data, Activity activity) {
 		super(data, activity);
+		this.act=activity;
 	}
 
 	@Override
@@ -46,25 +47,19 @@ public class ChatAdapter extends SimpleAdapter<Content> {
 			holder = (Holder) convertView.getTag();
 		}
 		if (item != null) {
-			if (item.getImageSrc()!=null&&item.getImageSrc().length() > 0) {
-				try {
-					holder.image.setVisibility(View.VISIBLE);
-					holder.msg.setVisibility(View.GONE);
-					byte[] bitmapArray = Base64.decode(item.getImageSrc());
-					Bitmap bit = BitmapFactory.decodeByteArray(bitmapArray, 0,
-							bitmapArray.length);
-					holder.image.setImageBitmap(bit);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else {
+			if(item.getMsgType() ==0){
 				holder.image.setVisibility(View.GONE);
 				holder.msg.setVisibility(View.VISIBLE);
 				holder.msg.setText(item.getMsg());
+			}else if(item.getMsgType()==1){
+				holder.image.setVisibility(View.VISIBLE);
+				holder.msg.setVisibility(View.GONE);
+				Bitmap bit = BitmapFactory.decodeFile(FileOperator.getLocalImageFolderPath(act)+item.getMsgLocalUrl());
+				holder.image.setImageBitmap(bit);
+			}else {
+				
 			}
 			holder.name.setText(item.getSendName());
-
 		}
 		return convertView;
 	}

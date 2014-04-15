@@ -16,23 +16,34 @@
         android:fastScrollEnabled="false"
         android:footerDividersEnabled="true"
         android:headerDividersEnabled="true"
-        android:transcriptMode="normal"  
         android:stackFromBottom="true"
-         />
-    <EditText
-        android:id="@+id/content"
+        android:transcriptMode="normal" />
+
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="50dp" />
+        android:layout_alignParentBottom="true" >
 
-    <Button
-        android:id="@+id/send"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="发送" />
+         <Button
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:text="图片" />
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp" />
+
+        <Button
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="文字" />
+    </RelativeLayout>
 
 </RelativeLayout>

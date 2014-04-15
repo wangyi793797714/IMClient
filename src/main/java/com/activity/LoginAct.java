@@ -73,7 +73,8 @@ public class LoginAct extends BaseActivity {
     }
 
     private void initFile() {
-        InitUtil.createFolder(this);
-        InitUtil.createFile(this, Const.DB__NAME);
+        InitUtil.createFolder(this,Const.DB_FOLDER_NAME);
+        InitUtil.createImageFolder(this,Const.LOCAL__IMAGE_FOLDER);
+        InitUtil.createFile(this, Const.DB__NAME,Const.DB_FOLDER_NAME);
     }
 }
