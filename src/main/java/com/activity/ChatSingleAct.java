@@ -11,10 +11,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.util.support.Base64;
-
 import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.view.ViewInject;
+
+import org.springframework.util.support.Base64;
+
 import util.FileOperator;
 import util.MsgComparator;
 import util.Util;
@@ -33,7 +34,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import application.IMApplication;
 import aysntask.FetchOnlineUserTask;
 import aysntask.LoginTask;
@@ -52,10 +55,10 @@ public class ChatSingleAct extends BaseActivity {
 	private PullToRefreshListView chatList;
 
 	@ViewInject(id = R.id.text)
-	private Button textBtn;
+	private ImageView textIma;
 
 	@ViewInject(id = R.id.image)
-	private Button imageBtn;
+	private ImageView imageIma;
 
 	@ViewInject(id = R.id.content)
 	private EditText input;
@@ -110,8 +113,8 @@ public class ChatSingleAct extends BaseActivity {
 						db.save(content);
 					} else if (content.getMsgType() == 1) {
 						try {
-							byte[] bitmapArray = Base64.decode(content
-									.getMsg());
+							byte[] bitmapArray = Base64
+									.decode(content.getMsg());
 							Bitmap bit = BitmapFactory.decodeByteArray(
 									bitmapArray, 0, bitmapArray.length);
 							FileOperator.saveImage2Sd(this, bit,
@@ -148,7 +151,7 @@ public class ChatSingleAct extends BaseActivity {
 		chatList.setAdapter(adapter);
 		chatList.setMode(Mode.PULL_FROM_START);
 		registerBoradcastReceiver(new msgBroadcastReceiver());
-		textBtn.setOnClickListener(new OnClickListener() {
+		textIma.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -204,74 +207,101 @@ public class ChatSingleAct extends BaseActivity {
 			}
 		});
 
-		imageBtn.setOnClickListener(new OnClickListener() {
+		imageIma.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				final Content content = new Content();
-				content.setBelongTo(vo.getChannelId() + ""
-						+ +db.findAll(Myself.class).get(0).getChannelId());
-				content.setDate(new Date());
-				// 指定发送消息的人为当前登录的人
-				content.setSendName(LoginTask.currentName);
-				content.setSendMsg(true);
-				content.setMsgType(1);
-				content.setSendId(db.findAll(Myself.class).get(0)
-						.getChannelId());
-				if (msg != null) {
-					content.setReceiveName(msg.getSendName());
-					content.setReceiveId(msg.getSendId());
-				} else {
-					if (!Util.isEmpty(msgs)) {
-						content.setReceiveId(msgs.get(0).getSendId());
-						content.setReceiveName(msgs.get(0).getSendName());
-					} else {
-						content.setReceiveName(vo.getName());
-						content.setReceiveId(vo.getChannelId());
+				View view = makeView(R.layout.popup_item);
+				PopupWindow popup = new PopupWindow(view, 250, 70);
+				popup.setContentView(view);
+				popup.setOutsideTouchable(true);
+				popup.showAsDropDown(imageIma);
+				Button album = (Button) view.findViewById(R.id.album);
+				album.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						toast("相册");
 					}
-				}
-				sendId = content.getReceiveId();
-
-				final Bitmap bit = BitmapFactory.decodeResource(getResources(),
-						R.drawable.loading_07);
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				bit.compress(Bitmap.CompressFormat.PNG, 100, bos);
-				byte[] src = bos.toByteArray();
-				String imageString = android.util.Base64.encodeToString(src,
-						android.util.Base64.DEFAULT);
-				content.setMsg(imageString);
-				final String imageUrl = UUID.randomUUID().toString();
-				content.setMsgLocalUrl(imageUrl);
-				FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
-						new GenericFutureListener<Future<? super Void>>() {
-							@Override
-							public void operationComplete(
-									Future<? super Void> future)
-									throws Exception {
-								if (future.isSuccess()) {
-									ChatSingleAct.this
-											.runOnUiThread(new Runnable() {
-
-												@Override
-												public void run() {
-													adapter.addItem(content,
-															adapter.getCount());
-													content.setIsRead("true");
-													content.setIsLocalMsg("true");
-													content.setMsg("");
-													db.save(content);
-													chatList.setSelection(adapter
-															.getCount() - 1);
-													FileOperator.saveImage2Sd(
-															ChatSingleAct.this,
-															bit, imageUrl);
-												}
-											});
-								}
-							}
-						});
+				});
+				Button takePhoto = (Button) view.findViewById(R.id.take_photo);
+				takePhoto.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						toast("照相");
+					}
+				});
 			}
 		});
+		// imageIma.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// final Content content = new Content();
+		// content.setBelongTo(vo.getChannelId() + ""
+		// + +db.findAll(Myself.class).get(0).getChannelId());
+		// content.setDate(new Date());
+		// // 指定发送消息的人为当前登录的人
+		// content.setSendName(LoginTask.currentName);
+		// content.setSendMsg(true);
+		// content.setMsgType(1);
+		// content.setSendId(db.findAll(Myself.class).get(0)
+		// .getChannelId());
+		// if (msg != null) {
+		// content.setReceiveName(msg.getSendName());
+		// content.setReceiveId(msg.getSendId());
+		// } else {
+		// if (!Util.isEmpty(msgs)) {
+		// content.setReceiveId(msgs.get(0).getSendId());
+		// content.setReceiveName(msgs.get(0).getSendName());
+		// } else {
+		// content.setReceiveName(vo.getName());
+		// content.setReceiveId(vo.getChannelId());
+		// }
+		// }
+		// sendId = content.getReceiveId();
+		//
+		// final Bitmap bit = BitmapFactory.decodeResource(getResources(),
+		// R.drawable.loading_07);
+		// ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		// bit.compress(Bitmap.CompressFormat.PNG, 100, bos);
+		// byte[] src = bos.toByteArray();
+		// String imageString = android.util.Base64.encodeToString(src,
+		// android.util.Base64.DEFAULT);
+		// content.setMsg(imageString);
+		// final String imageUrl = UUID.randomUUID().toString();
+		// content.setMsgLocalUrl(imageUrl);
+		// FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
+		// new GenericFutureListener<Future<? super Void>>() {
+		// @Override
+		// public void operationComplete(
+		// Future<? super Void> future)
+		// throws Exception {
+		// if (future.isSuccess()) {
+		// ChatSingleAct.this
+		// .runOnUiThread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// adapter.addItem(content,
+		// adapter.getCount());
+		// content.setIsRead("true");
+		// content.setIsLocalMsg("true");
+		// content.setMsg("");
+		// db.save(content);
+		// chatList.setSelection(adapter
+		// .getCount() - 1);
+		// FileOperator.saveImage2Sd(
+		// ChatSingleAct.this,
+		// bit, imageUrl);
+		// }
+		// });
+		// }
+		// }
+		// });
+		// }
+		// });
 
 		// select * from users order by id limit 10 offset 0
 		// offset代表从第几条记录“之后“开始查询，limit表明查询多少条结果

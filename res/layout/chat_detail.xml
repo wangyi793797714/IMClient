@@ -7,7 +7,7 @@
         android:id="@+id/lv_chat_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="45dp"
         android:background="@drawable/list_view_bg"
         android:cacheColorHint="#00000000"
         android:divider="#19000000"
@@ -22,28 +22,32 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/chat_bar_bg" 
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
 
-         <Button
+         <ImageView
             android:id="@+id/image"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignParentLeft="true"
-            android:text="图片" />
-        <EditText
-            android:id="@+id/content"
-            android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="60dp" />
-
-        <Button
+            android:background="@drawable/chat_iamge" />
+         <ImageView
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:text="文字" />
+            android:background="@drawable/chat_send"/>
+        <EditText
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/image"
+            android:layout_toLeftOf="@id/text"
+            android:maxLength="12" />
+
     </RelativeLayout>
 
 </RelativeLayout>
