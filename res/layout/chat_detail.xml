@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
     <com.handmark.pulltorefresh.library.PullToRefreshListView
         android:id="@+id/lv_chat_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="45dp"
         android:background="@drawable/list_view_bg"
         android:cacheColorHint="#00000000"
         android:divider="#19000000"
@@ -17,37 +17,58 @@
         android:footerDividersEnabled="true"
         android:headerDividersEnabled="true"
         android:stackFromBottom="true"
-        android:transcriptMode="normal" />
+        android:transcriptMode="normal"
+        android:layout_weight="1" />
 
     <RelativeLayout
+        android:id="@+id/input_bar"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/chat_bar_bg" 
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginRight="10dp"
+        android:background="@drawable/chat_bar_bg" >
 
-         <ImageView
+        <ImageView
             android:id="@+id/image"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignParentLeft="true"
             android:background="@drawable/chat_iamge" />
-         <ImageView
+
+        <ImageView
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/chat_send"/>
+            android:background="@drawable/chat_send" />
+
         <EditText
             android:id="@+id/content"
             android:layout_width="fill_parent"
             android:layout_height="40dp"
-            android:layout_toRightOf="@id/image"
             android:layout_toLeftOf="@id/text"
+            android:layout_toRightOf="@id/image"
             android:maxLength="12" />
-
     </RelativeLayout>
 
-</RelativeLayout>
+    <LinearLayout
+        android:id="@+id/photo_op"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+        <Button
+            android:id="@+id/album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="相册" />
+
+        <Button
+            android:id="@+id/take_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="拍照" />
+    </LinearLayout>
+
+</LinearLayout>
