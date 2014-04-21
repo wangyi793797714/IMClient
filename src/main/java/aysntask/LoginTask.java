@@ -86,9 +86,10 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
                 }
                 
             }
-            List<Content> unReadLoaclMsgs =db.findAllByWhere(Content.class, "isRead = 'false' ");
-            if(!Util.isEmpty(unReadLoaclMsgs)){
-                for(Content content:unReadLoaclMsgs){
+            //私聊本地未读消息
+            List<Content> unReadLoaclSingleMsgs =db.findAllByWhere(Content.class, "isRead = 'false' and grouppTag = 0 ");
+            if(!Util.isEmpty(unReadLoaclSingleMsgs)){
+                for(Content content:unReadLoaclSingleMsgs){
                     List<Content> msgs = HomeActivity.singleMsgs.get(content.getSendId());
                     if (Util.isEmpty(msgs)) {
                         msgs = new ArrayList<Content>();
@@ -96,6 +97,19 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
                     content.setIsLocalMsg("true");
                     msgs.add(content);
                     HomeActivity.singleMsgs.put(content.getSendId(), msgs);
+                }
+            }
+          //群聊本地未读消息
+            List<Content> unReadLoaclGroupMsgs =db.findAllByWhere(Content.class, "isRead = 'false' and grouppTag != 0 ");
+            if(!Util.isEmpty(unReadLoaclGroupMsgs)){
+                for(Content content:unReadLoaclGroupMsgs){
+                    List<Content> msgs = HomeActivity.groupMsgs.get(content.getGrouppTag());
+                    if (Util.isEmpty(msgs)) {
+                        msgs = new ArrayList<Content>();
+                    }
+                    content.setIsLocalMsg("true");
+                    msgs.add(content);
+                    HomeActivity.groupMsgs.put(content.getGrouppTag(), msgs);
                 }
             }
             act.skip(HomeActivity.class, result);

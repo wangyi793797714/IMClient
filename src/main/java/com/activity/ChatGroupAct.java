@@ -62,8 +62,21 @@ public class ChatGroupAct extends BaseActivity {
         super.onCreate(savedInstanceState);
         chatAdapter = new ChatAdapter(new ArrayList<Content>(), activity);
         if (!Util.isEmpty(HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag()))) {
-            chatAdapter
-                    .addItems(HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag()));
+            List<Content> msgs = HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag());
+            for (Content msg : msgs) {
+                if ("false".equals(msg.getIsLocalMsg())) {
+                    // 网络离线消息设置为本地并且为已读
+                    msg.setIsLocalMsg("true");
+                    msg.setIsRead("true");
+                    db.save(msg);
+                } else {
+                    // 本地已经存在的未读消息，修改为已读
+                    msg.setIsLocalMsg("true");
+                    msg.setIsRead("true");
+                    db.update(msg);
+                }
+            }
+            chatAdapter.addItems(msgs);
             HomeActivity.groupMsgs.get((((ChatRoom) getVo("0")).getGrouppTag())).clear();
         }
         setContentView(R.layout.group_chat);
@@ -171,7 +184,7 @@ public class ChatGroupAct extends BaseActivity {
                 content.setReceiveId(0);
                 content.setGrouppTag(CurrentGroup);
                 List<Integer> ids = new ArrayList<Integer>();
-                FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
+                final FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
                 for (RoomChild user : friends) {
                     if (user.getChannelId() != db.findAll(Myself.class).get(0).getChannelId()) {
                         ids.add(user.getChannelId());
@@ -189,6 +202,9 @@ public class ChatGroupAct extends BaseActivity {
                                         public void run() {
                                             chatAdapter.addItem(content, chatAdapter.getCount());
                                             chatList.setSelection(chatAdapter.getCount() - 1);
+                                            content.setIsLocalMsg("true");
+                                            content.setIsRead("true");
+                                            db.save(content);
                                         }
                                     });
                                 }
@@ -204,8 +220,11 @@ public class ChatGroupAct extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             if (Const.ACTION_GROUP_CHAT.equals(intent.getAction())) {
                 Content content = (Content) intent.getSerializableExtra("msg");
+                content.setIsLocalMsg("true");
+                content.setIsRead("true");
                 chatAdapter.addItem(content, chatAdapter.getCount());
                 chatList.setSelection(chatAdapter.getCount() - 1);
+                db.save(content);
             }
         }
 
