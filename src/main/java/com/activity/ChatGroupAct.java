@@ -3,10 +3,15 @@ package com.activity;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.util.support.Base64;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
@@ -33,13 +38,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import application.IMApplication;
 import aysntask.AddFriendToRoomTask;
@@ -53,11 +64,23 @@ public class ChatGroupAct extends BaseActivity {
     @ViewInject(id = R.id.lv_chat_detail)
     private PullToRefreshListView chatList;
 
-    @ViewInject(id = R.id.send)
-    private Button sendBtn;
+    @ViewInject(id = R.id.text)
+    private ImageView textIma;
+
+    @ViewInject(id = R.id.image)
+    private ImageView imageIma;
 
     @ViewInject(id = R.id.content)
     private EditText input;
+
+    @ViewInject(id = R.id.album)
+    private Button album;
+
+    @ViewInject(id = R.id.take_photo)
+    private Button takePhoto;
+
+    @ViewInject(id = R.id.photo_op)
+    private LinearLayout photoOp;
 
     private ChatAdapter chatAdapter;
 
@@ -96,7 +119,7 @@ public class ChatGroupAct extends BaseActivity {
             chatAdapter.addItems(msgs);
             HomeActivity.groupMsgs.get((((ChatRoom) getVo("0")).getGrouppTag())).clear();
         }
-        setContentView(R.layout.group_chat);
+        setContentView(R.layout.chat_detail);
         IMApplication.APP.addActivity(this);
         initView();
         registerBoradcastReceiver(new msgBroadcastReceiver());
@@ -192,14 +215,48 @@ public class ChatGroupAct extends BaseActivity {
                 new ShowLast10MsgsTask(activity, chatList, chatAdapter).execute(sql);
             }
         });
-    }
 
-    public void initView() {
-        chatList.setAdapter(chatAdapter);
-        sendBtn.setOnClickListener(new OnClickListener() {
+        imageIma.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                if (photoOp.isShown()) {
+                    photoOp.setVisibility(View.GONE);
+                } else {
+                    photoOp.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        album.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "选择照片"), 0);
+            }
+        });
+
+        takePhoto.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(Intent.createChooser(intent, "拍照中……"), 1);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (photoOp.isShown()) {
+            photoOp.setVisibility(View.GONE);
+        }
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 0 || requestCode == 1) {
+                photoZoom(data.getData());
+            } else if (requestCode == 2) {
+                final Bitmap bit = data.getParcelableExtra("data");
                 final Content content = new Content();
                 content.setDate(new Date());
                 content.setMsg(input.getText().toString());
@@ -216,6 +273,101 @@ public class ChatGroupAct extends BaseActivity {
                         ids.add(user.getChannelId());
                     }
                 }
+                content.setTargetIds(ids);
+                content.setMsgType(1);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bit.compress(Bitmap.CompressFormat.PNG, 100, bos);
+                byte[] src = bos.toByteArray();
+                String imageString = android.util.Base64.encodeToString(src,
+                        android.util.Base64.DEFAULT);
+                content.setMsg(imageString);
+                final String imageUrl = UUID.randomUUID().toString();
+                content.setMsgLocalUrl(imageUrl);
+                FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
+                        new GenericFutureListener<Future<? super Void>>() {
+                            @Override
+                            public void operationComplete(Future<? super Void> future)
+                                    throws Exception {
+                                if (future.isSuccess()) {
+                                    ChatGroupAct.this.runOnUiThread(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            chatAdapter.addItem(content, chatAdapter.getCount());
+                                            content.setIsRead("true");
+                                            content.setIsLocalMsg("true");
+                                            content.setMsg("");
+                                            db.save(content);
+                                            chatList.setSelection(chatAdapter.getCount() - 1);
+                                            FileOperator.saveImage2Sd(ChatGroupAct.this, bit,
+                                                    imageUrl);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+            }
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // 图片缩放
+    private void photoZoom(Uri uri) {
+        if (uri == null) {
+            Uri uri_DCIM = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            String DCIMPath = "";
+            Cursor cr = this.getContentResolver().query(uri_DCIM,
+                    new String[] { MediaStore.Images.Media.DATA }, null, null,
+                    MediaStore.Images.Media.DATE_MODIFIED + " desc");
+            if (cr.moveToNext()) {
+                DCIMPath = cr.getString(cr.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cr.close();
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            Bitmap bit = BitmapFactory.decodeFile(DCIMPath);
+            intent.putExtra("data", bit);
+            startActivityForResult(intent, 2);
+        } else {
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            intent.setDataAndType(uri, "image/*");
+            intent.putExtra("crop", "true");
+            // aspectX aspectY 是宽高的比例
+            intent.putExtra("aspectX", 1);
+            intent.putExtra("aspectY", 1);
+            // outputX outputY 是裁剪图片宽高
+            intent.putExtra("outputX", 250);
+            intent.putExtra("outputY", 250);
+            intent.putExtra("return-data", true);
+            startActivityForResult(intent, 2);
+        }
+    }
+
+    public void initView() {
+        chatList.setAdapter(chatAdapter);
+        textIma.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                photoOp.setVisibility(View.GONE);
+                final Content content = new Content();
+                content.setDate(new Date());
+                content.setMsg(input.getText().toString());
+                input.setText("");
+                // 指定发送者为当前登录的人
+                content.setSendName(LoginTask.currentName);
+                content.setSendMsg(true);
+                content.setReceiveId(0);
+                content.setGrouppTag(CurrentGroup);
+                List<Integer> ids = new ArrayList<Integer>();
+                final FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
+                for (RoomChild user : friends) {
+                    if (user.getChannelId() != db.findAll(Myself.class).get(0).getChannelId()) {
+                        ids.add(user.getChannelId());
+                    }
+                }
+                content.setMsgType(0);
                 content.setTargetIds(ids);
                 FetchOnlineUserTask.channel.writeAndFlush(content).addListener(
                         new GenericFutureListener<Future<? super Void>>() {
@@ -248,9 +400,24 @@ public class ChatGroupAct extends BaseActivity {
                 Content content = (Content) intent.getSerializableExtra("msg");
                 content.setIsLocalMsg("true");
                 content.setIsRead("true");
+                if (content.getMsgType() == 0) {
+                    db.save(content);
+                } else if (content.getMsgType() == 1) {
+                    try {
+                        byte[] bitmapArray = Base64.decode(content.getMsg());
+                        Bitmap bit = BitmapFactory.decodeByteArray(bitmapArray, 0,
+                                bitmapArray.length);
+                        FileOperator.saveImage2Sd(ChatGroupAct.this, bit, content.getMsgLocalUrl());
+                        content.setMsg("");
+                        db.save(content);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                }
                 chatAdapter.addItem(content, chatAdapter.getCount());
                 chatList.setSelection(chatAdapter.getCount() - 1);
-                db.save(content);
             }
         }
 
