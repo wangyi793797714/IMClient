@@ -4,12 +4,18 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.view.ViewInject;
 import util.FileOperator;
+import util.MsgComparator;
 import util.Util;
 import vo.ChatRoom;
 import vo.Content;
@@ -28,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -38,12 +45,13 @@ import application.IMApplication;
 import aysntask.AddFriendToRoomTask;
 import aysntask.FetchOnlineUserTask;
 import aysntask.LoginTask;
+import aysntask.ShowLast10MsgsTask;
 import config.Const;
 
 public class ChatGroupAct extends BaseActivity {
 
     @ViewInject(id = R.id.lv_chat_detail)
-    private ListView chatList;
+    private PullToRefreshListView chatList;
 
     @ViewInject(id = R.id.send)
     private Button sendBtn;
@@ -61,6 +69,15 @@ public class ChatGroupAct extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         chatAdapter = new ChatAdapter(new ArrayList<Content>(), activity);
+        final ChatRoom room = ((ChatRoom) getVo("0"));
+        friends = room.getChildDatas();
+        CurrentGroup = friends.get(0).getGroupTag();
+        final String sql = " grouppTag= " + CurrentGroup + " and isRead = 'true'";
+        List<Content> lastList = db.findAllByWhere(Content.class, sql, "date DESC LIMIT 10");
+        if (!Util.isEmpty(lastList)) {
+            Collections.sort(lastList, new MsgComparator());
+            chatAdapter.addItems(lastList);
+        }
         if (!Util.isEmpty(HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag()))) {
             List<Content> msgs = HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag());
             for (Content msg : msgs) {
@@ -83,9 +100,6 @@ public class ChatGroupAct extends BaseActivity {
         IMApplication.APP.addActivity(this);
         initView();
         registerBoradcastReceiver(new msgBroadcastReceiver());
-        final ChatRoom room = ((ChatRoom) getVo("0"));
-        friends = room.getChildDatas();
-        CurrentGroup = friends.get(0).getGroupTag();
         getActionBar().setCustomView(R.layout.main_action_button);
         getActionBar().setDisplayShowCustomEnabled(true);
         ImageView addFriend = (ImageView) getActionBar().getCustomView();
@@ -164,6 +178,18 @@ public class ChatGroupAct extends BaseActivity {
                 });
                 builder.create();
                 builder.show();
+            }
+        });
+
+        chatList.setOnRefreshListener(new OnRefreshListener<ListView>() {
+
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                String label = DateUtils.formatDateTime(getApplicationContext(),
+                        System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
+                                | DateUtils.FORMAT_ABBREV_ALL);
+                chatList.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+                new ShowLast10MsgsTask(activity, chatList, chatAdapter).execute(sql);
             }
         });
     }
