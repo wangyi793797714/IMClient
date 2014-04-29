@@ -4,6 +4,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -225,8 +227,8 @@ public class ChatSingleAct extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
+                Intent intent = new Intent(Intent.ACTION_PICK, null);
+                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(Intent.createChooser(intent, "选择照片"), 0);
             }
         });
@@ -236,6 +238,8 @@ public class ChatSingleAct extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment
+                        .getExternalStorageDirectory(), "temp.png")));
                 startActivityForResult(Intent.createChooser(intent, "拍照中……"), 1);
             }
         });
@@ -258,18 +262,15 @@ public class ChatSingleAct extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (photoOp.isShown()) {
             photoOp.setVisibility(View.GONE);
-        }
         if (resultCode == RESULT_OK) {
             if (requestCode == 0) {
                 photoZoom(data.getData());
             } else if (requestCode == 1) {
-                photoZoom(data.getData());
+                File temp = new File(Environment.getExternalStorageDirectory() + "/temp.png");
+                photoZoom(Uri.fromFile(temp));
             } else if (requestCode == 2) {
-                photoOp.setVisibility(View.GONE);
                 final Bitmap bit = data.getParcelableExtra("data");
-
                 final Content content = new Content();
                 content.setBelongTo(vo.getChannelId() + ""
                         + +db.findAll(Myself.class).get(0).getChannelId());
@@ -338,10 +339,10 @@ public class ChatSingleAct extends BaseActivity {
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
+        intent.putExtra("aspectY", 1.5);
         // outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 250);
-        intent.putExtra("outputY", 250);
+        intent.putExtra("outputX", 100);
+        intent.putExtra("outputY", 150);
         intent.putExtra("return-data", true);
         startActivityForResult(intent, 2);
     }

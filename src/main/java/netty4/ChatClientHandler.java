@@ -60,6 +60,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof Content) {
+            FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
             final Content content = (Content) msg;
             content.setSendMsg(false);
             Intent intent = new Intent();
@@ -70,7 +71,6 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                 if (cn.getClassName().equals("com.activity.ChatSingleAct")) {
                     if (content.getSendId() == ChatSingleAct.sendId) {
                         intent.setAction(Const.ACTION_SINGLE_BROADCAST);
-                        FinalDb db = FinalDb.create(act, FileOperator.getDbPath(act), true);
                         content.setIsRead("true");
                         content.setIsLocalMsg("true");
                         if (content.getMsgType() == 0) {
@@ -120,6 +120,23 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                 if (cn.getClassName().equals("com.activity.HomeActivity")) {
                     intent.setAction(Const.ACTION_GROUP_MAIN);
                     content.setIsRead("false");
+                    content.setIsLocalMsg("true");
+                    if (content.getMsgType() == 0) {
+                        db.save(content);
+                    } else if (content.getMsgType() == 1) {
+                        try {
+                            byte[] bitmapArray = Base64.decode(content.getMsg());
+                            Bitmap bit = BitmapFactory.decodeByteArray(bitmapArray, 0,
+                                    bitmapArray.length);
+                            FileOperator.saveImage2Sd(act, bit, content.getMsgLocalUrl());
+                            content.setMsg("");
+                            db.save(content);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
                     if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
                         HomeActivity.groupMsgs.get(content.getGrouppTag()).add(content);
                     } else {
@@ -135,6 +152,23 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
                 } else if (cn.getClassName().equals("com.activity.ChatGroupAct")
                         && ChatGroupAct.CurrentGroup != content.getGrouppTag()) {
                     content.setIsRead("false");
+                    content.setIsLocalMsg("true");
+                    if (content.getMsgType() == 0) {
+                        db.save(content);
+                    } else if (content.getMsgType() == 1) {
+                        try {
+                            byte[] bitmapArray = Base64.decode(content.getMsg());
+                            Bitmap bit = BitmapFactory.decodeByteArray(bitmapArray, 0,
+                                    bitmapArray.length);
+                            FileOperator.saveImage2Sd(act, bit, content.getMsgLocalUrl());
+                            content.setMsg("");
+                            db.save(content);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
                     if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
                         HomeActivity.groupMsgs.get(content.getGrouppTag()).add(content);
                     } else {

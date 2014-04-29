@@ -4,6 +4,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,14 +12,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.util.support.Base64;
-
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.view.ViewInject;
+
+import org.springframework.util.support.Base64;
+
 import util.FileOperator;
 import util.MsgComparator;
 import util.Util;
@@ -38,11 +36,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -57,6 +55,11 @@ import aysntask.AddFriendToRoomTask;
 import aysntask.FetchOnlineUserTask;
 import aysntask.LoginTask;
 import aysntask.ShowLast10MsgsTask;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import config.Const;
 
 public class ChatGroupAct extends BaseActivity {
@@ -103,17 +106,34 @@ public class ChatGroupAct extends BaseActivity {
         }
         if (!Util.isEmpty(HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag()))) {
             List<Content> msgs = HomeActivity.groupMsgs.get(((ChatRoom) getVo("0")).getGrouppTag());
+            Collections.sort(msgs, new MsgComparator());
             for (Content msg : msgs) {
                 if ("false".equals(msg.getIsLocalMsg())) {
                     // 网络离线消息设置为本地并且为已读
-                    msg.setIsLocalMsg("true");
+                 // 网络离线消息设置为本地并且为已读
                     msg.setIsRead("true");
-                    db.save(msg);
+                    msg.setIsLocalMsg("true");
+                    if (msg.getMsgType() == 0) {
+                        db.save(msg);
+                    } else if (msg.getMsgType() == 1) {
+                        try {
+                            byte[] bitmapArray = Base64.decode(msg.getMsg());
+                            Bitmap bit = BitmapFactory.decodeByteArray(bitmapArray, 0,
+                                    bitmapArray.length);
+                            FileOperator.saveImage2Sd(this, bit, msg.getMsgLocalUrl());
+                            msg.setMsg("");
+                            db.save(msg);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
                 } else {
                     // 本地已经存在的未读消息，修改为已读
                     msg.setIsLocalMsg("true");
                     msg.setIsRead("true");
-                    db.update(msg);
+                    db.update(msg," uuid = '"+msg.getUuid()+"'");
                 }
             }
             chatAdapter.addItems(msgs);
@@ -231,8 +251,8 @@ public class ChatGroupAct extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
+                Intent intent = new Intent(Intent.ACTION_PICK, null);
+                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(Intent.createChooser(intent, "选择照片"), 0);
             }
         });
@@ -242,6 +262,8 @@ public class ChatGroupAct extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment
+                        .getExternalStorageDirectory(), "temp.png")));
                 startActivityForResult(Intent.createChooser(intent, "拍照中……"), 1);
             }
         });
@@ -249,12 +271,13 @@ public class ChatGroupAct extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (photoOp.isShown()) {
-            photoOp.setVisibility(View.GONE);
-        }
+        photoOp.setVisibility(View.GONE);
         if (resultCode == RESULT_OK) {
-            if (requestCode == 0 || requestCode == 1) {
+            if (requestCode == 0) {
                 photoZoom(data.getData());
+            } else if (requestCode == 1) {
+                File temp = new File(Environment.getExternalStorageDirectory() + "/temp.png");
+                photoZoom(Uri.fromFile(temp));
             } else if (requestCode == 2) {
                 final Bitmap bit = data.getParcelableExtra("data");
                 final Content content = new Content();
@@ -266,6 +289,7 @@ public class ChatGroupAct extends BaseActivity {
                 content.setSendMsg(true);
                 content.setReceiveId(0);
                 content.setGrouppTag(CurrentGroup);
+                content.setUuid(UUID.randomUUID().toString());                
                 List<Integer> ids = new ArrayList<Integer>();
                 final FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
                 for (RoomChild user : friends) {
@@ -315,33 +339,17 @@ public class ChatGroupAct extends BaseActivity {
 
     // 图片缩放
     private void photoZoom(Uri uri) {
-        if (uri == null) {
-            Uri uri_DCIM = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            String DCIMPath = "";
-            Cursor cr = this.getContentResolver().query(uri_DCIM,
-                    new String[] { MediaStore.Images.Media.DATA }, null, null,
-                    MediaStore.Images.Media.DATE_MODIFIED + " desc");
-            if (cr.moveToNext()) {
-                DCIMPath = cr.getString(cr.getColumnIndex(MediaStore.Images.Media.DATA));
-            }
-            cr.close();
-            Intent intent = new Intent("com.android.camera.action.CROP");
-            Bitmap bit = BitmapFactory.decodeFile(DCIMPath);
-            intent.putExtra("data", bit);
-            startActivityForResult(intent, 2);
-        } else {
-            Intent intent = new Intent("com.android.camera.action.CROP");
-            intent.setDataAndType(uri, "image/*");
-            intent.putExtra("crop", "true");
-            // aspectX aspectY 是宽高的比例
-            intent.putExtra("aspectX", 1);
-            intent.putExtra("aspectY", 1);
-            // outputX outputY 是裁剪图片宽高
-            intent.putExtra("outputX", 250);
-            intent.putExtra("outputY", 250);
-            intent.putExtra("return-data", true);
-            startActivityForResult(intent, 2);
-        }
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("crop", "true");
+        // aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1.5);
+        // outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 100);
+        intent.putExtra("outputY", 150);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, 2);
     }
 
     public void initView() {
@@ -360,6 +368,7 @@ public class ChatGroupAct extends BaseActivity {
                 content.setSendMsg(true);
                 content.setReceiveId(0);
                 content.setGrouppTag(CurrentGroup);
+                content.setUuid(UUID.randomUUID().toString()); 
                 List<Integer> ids = new ArrayList<Integer>();
                 final FinalDb db = FinalDb.create(activity, FileOperator.getDbPath(activity), true);
                 for (RoomChild user : friends) {
