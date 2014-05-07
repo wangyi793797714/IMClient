@@ -19,7 +19,4 @@ public class InitUtil {
         return folderPath;
     }
     
-    public static boolean createImageFolder(Context context,String folderName){
-    	return FileOperator.createFolder(folderPath(context,folderName));
-    }
 }

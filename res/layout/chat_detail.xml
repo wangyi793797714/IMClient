@@ -8,6 +8,7 @@
         android:id="@+id/lv_chat_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_weight="1"
         android:background="@drawable/list_view_bg"
         android:cacheColorHint="#00000000"
         android:divider="#19000000"
@@ -17,8 +18,7 @@
         android:footerDividersEnabled="true"
         android:headerDividersEnabled="true"
         android:stackFromBottom="true"
-        android:transcriptMode="normal"
-        android:layout_weight="1" />
+        android:transcriptMode="normal" />
 
     <RelativeLayout
         android:id="@+id/input_bar"
@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:visibility="gone" >
+
         <Button
             android:id="@+id/album"
             android:layout_width="wrap_content"
@@ -69,6 +70,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="拍照" />
+
+        <Button
+            android:id="@+id/record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="录音" />
+ 		<Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="播放" />
+        
     </LinearLayout>
 
 </LinearLayout>
