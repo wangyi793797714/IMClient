@@ -102,8 +102,10 @@ public class ChatGroupAct extends BaseActivity {
 
 	MediaRecorder record = null;
 	MediaPlayer player = null;
-	String voicePath;
 
+	String voicePath;
+	String remoteVoicePath;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -304,8 +306,9 @@ public class ChatGroupAct extends BaseActivity {
 				if (record == null) {
 					record = new MediaRecorder();
 				}
+				remoteVoicePath=UUID.randomUUID().toString() + ".amr";
 				voicePath = FileOperator.getLocalVoiceFolderPath(activity)
-						+ UUID.randomUUID().toString() + ".amr";
+						+ remoteVoicePath;
 				record.setAudioSource(MediaRecorder.AudioSource.MIC);
 				record.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
 				record.setOutputFile(voicePath);
@@ -365,7 +368,7 @@ public class ChatGroupAct extends BaseActivity {
 						String voiceString = android.util.Base64
 								.encodeToString(b, android.util.Base64.DEFAULT);
 						content.setMsg(voiceString);
-						content.setMsgLocalUrl(voicePath);
+						content.setMsgLocalUrl(remoteVoicePath);
 
 						FetchOnlineUserTask.channel
 								.writeAndFlush(content)
@@ -386,6 +389,7 @@ public class ChatGroupAct extends BaseActivity {
 																			chatAdapter.getCount());
 																	content.setIsRead("true");
 																	content.setIsLocalMsg("true");
+																	content.setMsgLocalUrl(voicePath);
 																	db.save(content);
 																	chatList.setSelection(chatAdapter
 																			.getCount() - 1);

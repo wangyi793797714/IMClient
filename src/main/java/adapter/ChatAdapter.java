@@ -131,9 +131,10 @@ public class ChatAdapter extends SimpleAdapter<Content> {
 				player.reset();
 				try {
 //					player.setDataSource(msg.getMsgLocalUrl());
-					
+//					
 					File file = new File(msg.getMsgLocalUrl()); 
 					FileInputStream fis = new FileInputStream(file); 
+//					player.setDataSource(fis., fis.getStartOffset(), fis.getLength());
 					player.setDataSource(fis.getFD()); 
 					player.prepare();
 					player.start();

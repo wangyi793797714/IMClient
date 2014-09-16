@@ -100,6 +100,8 @@ public class ChatSingleAct extends BaseActivity {
 	MediaPlayer player = null;
 	String voicePath;
 
+	String remoteVoicePath;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -283,8 +285,10 @@ public class ChatSingleAct extends BaseActivity {
 				if (record == null) {
 					record = new MediaRecorder();
 				}
+				remoteVoicePath=UUID.randomUUID().toString() + ".amr";
 				voicePath = FileOperator.getLocalVoiceFolderPath(activity)
-						+ UUID.randomUUID().toString() + ".amr";
+						+remoteVoicePath;
+				
 				record.setAudioSource(MediaRecorder.AudioSource.MIC);
 				record.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
 				record.setOutputFile(voicePath);
@@ -331,9 +335,9 @@ public class ChatSingleAct extends BaseActivity {
 						String voiceString = android.util.Base64
 								.encodeToString(b, android.util.Base64.DEFAULT);
 						content.setMsg(voiceString);
-						content.setMsgLocalUrl(voicePath);
-
-						content.setMsg(input.getText().toString());
+//						content.setMsgLocalUrl(voicePath);
+						content.setMsgLocalUrl(remoteVoicePath);
+						
 						// 指定发送消息的人为当前登录的人
 						content.setSendName(LoginTask.currentName);
 						content.setSendMsg(true);
@@ -373,6 +377,7 @@ public class ChatSingleAct extends BaseActivity {
 																			adapter.getCount());
 																	content.setIsRead("true");
 																	content.setIsLocalMsg("true");
+																	content.setMsgLocalUrl(voicePath);
 																	db.save(content);
 																	chatList.setSelection(adapter
 																			.getCount() - 1);
