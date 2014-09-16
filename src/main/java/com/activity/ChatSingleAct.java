@@ -158,6 +158,7 @@ public class ChatSingleAct extends BaseActivity {
 						FileOperator.saveVoice2Sd(this, content.getMsg(),
 								content.getMsgLocalUrl());
 						content.setMsg("");
+						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(activity)+ content.getMsgLocalUrl());
 						db.save(content);
 					}
 					tempDatas.add(content);
@@ -282,7 +283,7 @@ public class ChatSingleAct extends BaseActivity {
 				if (record == null) {
 					record = new MediaRecorder();
 				}
-				voicePath = FileOperator.getLocalVoiceFolderPaht(activity)
+				voicePath = FileOperator.getLocalVoiceFolderPath(activity)
 						+ UUID.randomUUID().toString() + ".amr";
 				record.setAudioSource(MediaRecorder.AudioSource.MIC);
 				record.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);

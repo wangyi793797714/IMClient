@@ -96,6 +96,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 							FileOperator.saveVoice2Sd(act, content.getMsg(),
 									content.getMsgLocalUrl());
 							content.setMsg("");
+							content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
 							db.save(content);
 						}
 					} else {
@@ -146,8 +147,12 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} else {
-
+					} else if(content.getMsgType() == 2){
+						FileOperator.saveVoice2Sd(act, content.getMsg(),
+								content.getMsgLocalUrl());
+						content.setMsg("");
+						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						db.save(content);
 					}
 					if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
 						HomeActivity.groupMsgs.get(content.getGrouppTag()).add(
@@ -167,6 +172,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 				} else if (cn.getClassName()
 						.equals("com.activity.ChatGroupAct")
 						&& ChatGroupAct.CurrentGroup != content.getGrouppTag()) {
+					intent.setAction(Const.ACTION_GROUP_MAIN);
 					content.setIsRead("false");
 					content.setIsLocalMsg("true");
 					if (content.getMsgType() == 0) {
@@ -184,8 +190,47 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+					} else if(content.getMsgType() == 2){
+						FileOperator.saveVoice2Sd(act, content.getMsg(),
+								content.getMsgLocalUrl());
+						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						content.setMsg("");
+						db.save(content);
+					}
+					if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
+						HomeActivity.groupMsgs.get(content.getGrouppTag()).add(
+								content);
 					} else {
-
+						List<Content> data = new ArrayList<Content>();
+						data.add(content);
+						HomeActivity.groupMsgs
+								.put(content.getGrouppTag(), data);
+					}
+				}else{
+					intent.setAction(Const.ACTION_GROUP_MAIN);
+					content.setIsRead("false");
+					content.setIsLocalMsg("true");
+					if (content.getMsgType() == 0) {
+						db.save(content);
+					} else if (content.getMsgType() == 1) {
+						try {
+							byte[] bitmapArray = Base64
+									.decode(content.getMsg());
+							Bitmap bit = BitmapFactory.decodeByteArray(
+									bitmapArray, 0, bitmapArray.length);
+							FileOperator.saveImage2Sd(act, bit,
+									content.getMsgLocalUrl());
+							content.setMsg("");
+							db.save(content);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else if(content.getMsgType() == 2){
+						FileOperator.saveVoice2Sd(act, content.getMsg(),
+								content.getMsgLocalUrl());
+						content.setMsg("");
+						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						db.save(content);
 					}
 					if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
 						HomeActivity.groupMsgs.get(content.getGrouppTag()).add(

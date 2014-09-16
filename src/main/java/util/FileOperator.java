@@ -72,7 +72,7 @@ public class FileOperator {
 		return folderPath;
 	}
 
-	public static String getLocalVoiceFolderPaht(Context context) {
+	public static String getLocalVoiceFolderPath(Context context) {
 		String folderPath = FileOperator.getPath(context) + File.separator
 				+ Const.LOCAL__VOICE_FOLDER + File.separator;
 		return folderPath;
@@ -95,7 +95,7 @@ public class FileOperator {
 	public static void saveVoice2Sd(Context context, String voice,
 			String fileName) {
 		try {
-			File voiceFile = new File(getLocalVoiceFolderPaht(context)
+			File voiceFile = new File(getLocalVoiceFolderPath(context)
 					+ fileName);
 			BufferedOutputStream bos = new BufferedOutputStream(
 					new FileOutputStream(voiceFile));

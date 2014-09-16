@@ -1,5 +1,7 @@
 package adapter;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -128,7 +130,11 @@ public class ChatAdapter extends SimpleAdapter<Content> {
 				}
 				player.reset();
 				try {
-					player.setDataSource(msg.getMsgLocalUrl());
+//					player.setDataSource(msg.getMsgLocalUrl());
+					
+					File file = new File(msg.getMsgLocalUrl()); 
+					FileInputStream fis = new FileInputStream(file); 
+					player.setDataSource(fis.getFD()); 
 					player.prepare();
 					player.start();
 				} catch (IOException e) {

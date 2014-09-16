@@ -592,6 +592,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 																		unReadMsg
 																				.getMsgLocalUrl());
 														unReadMsg.setMsg("");
+														unReadMsg.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(HomeActivity.this)+ unReadMsg.getMsgLocalUrl());
 														db.save(unReadMsg);
 													}
 												}

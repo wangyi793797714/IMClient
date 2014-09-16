@@ -5,3 +5,6 @@
 .classpath
 .project
 .settings/
+lint.xml
+project.properties
+.gradle/
