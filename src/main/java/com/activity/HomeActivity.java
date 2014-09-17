@@ -1,5 +1,11 @@
 package com.activity;
 
+import fragment.DynamicFragment;
+import fragment.FriendFragment;
+import fragment.FriendFragment.Regist;
+import fragment.GroupFragment;
+import fragment.GroupFragment.CreateRoom;
+import fragment.SettingsFragment;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
@@ -20,12 +26,6 @@ import vo.Content;
 import vo.Friends;
 import vo.Myself;
 import vo.RoomChild;
-import widget.FirstFragment;
-import widget.FirstFragment.Regist;
-import widget.FourthFragment;
-import widget.TestFragment;
-import widget.ThirdFragment;
-import widget.ThirdFragment.createRoom;
 import adapter.FragAdapter;
 import adapter.GroupChatAdapter;
 import adapter.MyExpandAdapter;
@@ -69,7 +69,7 @@ import broadcast.UserOnlineReceiver;
 import config.Const;
 
 public class HomeActivity extends FragmentActivity implements OnClickListener,
-		StretchAnimation.AnimationListener, Regist, createRoom {
+		StretchAnimation.AnimationListener, Regist, CreateRoom {
 
 	private FragAdapter adapter;
 
@@ -198,10 +198,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 
 	private void initViewPage() {
 		List<Fragment> fragments = new ArrayList<Fragment>();
-		FirstFragment one = new FirstFragment();
-		FourthFragment two = new FourthFragment();
-		ThirdFragment three = new ThirdFragment();
-		TestFragment four = new TestFragment();
+		FriendFragment one = new FriendFragment();
+		DynamicFragment two = new DynamicFragment();
+		GroupFragment three = new GroupFragment();
+		SettingsFragment four = new SettingsFragment();
 
 		fragments.add(one);
 		fragments.add(three);

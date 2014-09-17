@@ -1,4 +1,4 @@
-package widget;
+package fragment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,7 +32,14 @@ import com.activity.R;
 
 import config.Const;
 
-public class FirstFragment extends BaseFragment {
+/**
+ * 
+ * @Des: 好友
+ * @author Rhino 
+ * @version V1.0 
+ * @created  2014年9月17日 下午2:20:36
+ */
+public class FriendFragment extends BaseFragment {
 
     private ListView onlineList;
 

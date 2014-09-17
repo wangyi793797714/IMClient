@@ -1,4 +1,4 @@
-package widget;
+package fragment;
 
 import java.io.Serializable;
 

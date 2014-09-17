@@ -1,4 +1,4 @@
-package widget;
+package fragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import util.FileOperator;
 import util.Util;
 import vo.ChatRoom;
 import vo.RoomChild;
+import widget.BadgeView;
 import adapter.MyExpandAdapter;
 import android.app.Activity;
 import android.content.IntentFilter;
@@ -30,8 +31,14 @@ import com.activity.HomeActivity;
 import com.activity.R;
 
 import config.Const;
-
-public class ThirdFragment extends BaseFragment {
+/**
+ * 
+ * @Des: 
+ * @author Rhino 
+ * @version V1.0 
+ * @created  2014年9月17日 下午2:15:14
+ */
+public class GroupFragment extends BaseFragment {
 
     private ExpandableListView exListView;
 
@@ -40,14 +47,14 @@ public class ThirdFragment extends BaseFragment {
     /** 控制列表的展开，用于每次都定位于展开的项 */
     private int sign = -1;
 
-    private createRoom create;
+    private CreateRoom create;
 
     private boolean isFirst = true;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        create = (createRoom) activity;
+        create = (CreateRoom) activity;
         FinalDb db = FinalDb.create(getActivity(), FileOperator.getDbPath(getActivity()), true);
         adapter = new MyExpandAdapter(getActivity(), new ArrayList<ChatRoom>());
         create.create(adapter);
@@ -164,7 +171,7 @@ public class ThirdFragment extends BaseFragment {
         }
     }
 
-    public interface createRoom {
+    public interface CreateRoom {
         public void create(MyExpandAdapter adapter);
     }
 }

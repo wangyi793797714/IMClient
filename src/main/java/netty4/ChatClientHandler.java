@@ -96,7 +96,9 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 							FileOperator.saveVoice2Sd(act, content.getMsg(),
 									content.getMsgLocalUrl());
 							content.setMsg("");
-							content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+							content.setMsgLocalUrl(FileOperator
+									.getLocalVoiceFolderPath(act)
+									+ content.getMsgLocalUrl());
 							db.save(content);
 						}
 					} else {
@@ -147,11 +149,13 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} else if(content.getMsgType() == 2){
+					} else if (content.getMsgType() == 2) {
 						FileOperator.saveVoice2Sd(act, content.getMsg(),
 								content.getMsgLocalUrl());
 						content.setMsg("");
-						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						content.setMsgLocalUrl(FileOperator
+								.getLocalVoiceFolderPath(act)
+								+ content.getMsgLocalUrl());
 						db.save(content);
 					}
 					if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
@@ -190,10 +194,12 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} else if(content.getMsgType() == 2){
+					} else if (content.getMsgType() == 2) {
 						FileOperator.saveVoice2Sd(act, content.getMsg(),
 								content.getMsgLocalUrl());
-						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						content.setMsgLocalUrl(FileOperator
+								.getLocalVoiceFolderPath(act)
+								+ content.getMsgLocalUrl());
 						content.setMsg("");
 						db.save(content);
 					}
@@ -206,7 +212,7 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						HomeActivity.groupMsgs
 								.put(content.getGrouppTag(), data);
 					}
-				}else{
+				} else {
 					intent.setAction(Const.ACTION_GROUP_MAIN);
 					content.setIsRead("false");
 					content.setIsLocalMsg("true");
@@ -225,11 +231,13 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<Object> {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} else if(content.getMsgType() == 2){
+					} else if (content.getMsgType() == 2) {
 						FileOperator.saveVoice2Sd(act, content.getMsg(),
 								content.getMsgLocalUrl());
 						content.setMsg("");
-						content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(act)+ content.getMsgLocalUrl());
+						content.setMsgLocalUrl(FileOperator
+								.getLocalVoiceFolderPath(act)
+								+ content.getMsgLocalUrl());
 						db.save(content);
 					}
 					if (HomeActivity.groupMsgs.get(content.getGrouppTag()) != null) {
