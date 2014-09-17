@@ -93,14 +93,19 @@ public class ChatSingleAct extends BaseActivity {
 	public static int sendId = -1;
 
 	private FinalDb db;
-	Content msg;
-	Myself vo;
-	List<Content> msgs;
-	MediaRecorder record = null;
-	MediaPlayer player = null;
-	String voicePath;
+	
+	/**通过点击通知栏，传入的信息*/
+	private Content notifyMsg;
+	private Myself vo;
+	private List<Content> msgs;
+	private MediaRecorder record = null;
+	private MediaPlayer player = null;
+	
+	/**本地保存的声音路径，存于数据库，在播放的时候，直接根据路径播放，由voiceName+本地sd卡的路径决定*/
+	private String voicePath;
 
-	String remoteVoicePath;
+	/**发送出去的音频文件名字*/
+	private String voiceName;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -112,9 +117,17 @@ public class ChatSingleAct extends BaseActivity {
 				FileOperator.getDbPath(getActivity()), true);
 
 		// 由通知栏传入
-		msg = (Content) getIntent().getExtras().getSerializable("3");
+		notifyMsg = (Content) getIntent().getExtras().getSerializable("3");
 		// 由主界面传入
 		vo = (Myself) getVo("0");
+		
+		int tempId=-1;
+		
+		if(notifyMsg!=null){
+			tempId=notifyMsg.getSendId();	
+		}else{
+			tempId=vo.getChannelId();
+		}
 		sendId = vo.getChannelId();
 
 		// 包含网络未读消息和本地未读消息（本地未读消息数据库中已经存在）
@@ -122,10 +135,10 @@ public class ChatSingleAct extends BaseActivity {
 
 		adapter = new ChatAdapter(new ArrayList<Content>(), activity);
 		// 获取最近10条已读消息
-		String key1 = sendId + ""
+		String key1 = tempId + ""
 				+ db.findAll(Myself.class).get(0).getChannelId();
 		String key2 = db.findAll(Myself.class).get(0).getChannelId() + ""
-				+ sendId;
+				+ tempId;
 		final String sqlSplit = " belongTo = '" + key1 + "' or belongTo = '"
 				+ key2 + "' ";
 		List<Content> lastMsgs = db.findAllByWhere(Content.class,
@@ -175,14 +188,55 @@ public class ChatSingleAct extends BaseActivity {
 
 		Collections.sort(tempDatas, new MsgComparator());
 		adapter.addItems(tempDatas);
-		if (msg != null) {
-			sendId = msg.getSendId();
-			adapter.addItem(msg, 0);
-			msg.setIsRead("true");
-			msg.setIsLocalMsg("true");
-			db.save(msg);
+		if (notifyMsg != null) {
+			List<Content> orderMsgs=new ArrayList<Content>();
+			//如果从通知栏获取的信息，标记为已读并保存到本地，同时删除掉在Home消息容器中的对应数据
+			sendId = notifyMsg.getSendId();
+			notifyMsg.setIsRead("true");
+			notifyMsg.setIsLocalMsg("true");
+			//获取未读消息，包含已经存在本地的，以及网络发送来的，以及未读的通知
+			List<Content> unReadMsgs= HomeActivity.singleMsgs.get(notifyMsg.getSendId());
+			if(!Util.isEmpty(unReadMsgs)){
+				for (Content content : unReadMsgs) {
+					if ("false".equals(content.getIsLocalMsg())) {
+						// 网络离线消息设置为本地并且为已读
+						content.setIsRead("true");
+						content.setIsLocalMsg("true");
+						if (content.getMsgType() == 0) {
+							db.save(content);
+						} else if (content.getMsgType() == 1) {
+							try {
+								byte[] bitmapArray = Base64
+										.decode(content.getMsg());
+								Bitmap bit = BitmapFactory.decodeByteArray(
+										bitmapArray, 0, bitmapArray.length);
+								FileOperator.saveImage2Sd(this, bit,
+										content.getMsgLocalUrl());
+								content.setMsg("");
+								db.save(content);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						} else {
+							FileOperator.saveVoice2Sd(this, content.getMsg(),
+									content.getMsgLocalUrl());
+							content.setMsg("");
+							content.setMsgLocalUrl(FileOperator.getLocalVoiceFolderPath(activity)+ content.getMsgLocalUrl());
+							db.save(content);
+						}
+						orderMsgs.add(content);
+					} else {
+						// 本地已经存在的未读消息，修改为已读
+						content.setIsRead("true");
+						content.setIsLocalMsg("true");
+						db.update(content);
+					}
+				}
+			}
+			Collections.sort(orderMsgs, new MsgComparator());
+			adapter.addItems(orderMsgs,adapter.getCount());
 			HomeActivity.singleMsgs.remove(vo.getChannelId());
-			sendBroadcast(ChatSingleAct.this, msg);
+			sendBroadcast(ChatSingleAct.this, notifyMsg);
 		}
 		chatList.setAdapter(adapter);
 		chatList.setMode(Mode.PULL_FROM_START);
@@ -204,9 +258,9 @@ public class ChatSingleAct extends BaseActivity {
 				content.setMsgType(0);
 				content.setSendId(db.findAll(Myself.class).get(0)
 						.getChannelId());
-				if (msg != null) {
-					content.setReceiveName(msg.getSendName());
-					content.setReceiveId(msg.getSendId());
+				if (notifyMsg != null) {
+					content.setReceiveName(notifyMsg.getSendName());
+					content.setReceiveId(notifyMsg.getSendId());
 				} else {
 					if (!Util.isEmpty(msgs)) {
 						content.setReceiveId(msgs.get(0).getSendId());
@@ -285,9 +339,9 @@ public class ChatSingleAct extends BaseActivity {
 				if (record == null) {
 					record = new MediaRecorder();
 				}
-				remoteVoicePath=UUID.randomUUID().toString() + ".amr";
+				voiceName=UUID.randomUUID().toString() + ".amr";
 				voicePath = FileOperator.getLocalVoiceFolderPath(activity)
-						+remoteVoicePath;
+						+voiceName;
 				
 				record.setAudioSource(MediaRecorder.AudioSource.MIC);
 				record.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
@@ -336,7 +390,7 @@ public class ChatSingleAct extends BaseActivity {
 								.encodeToString(b, android.util.Base64.DEFAULT);
 						content.setMsg(voiceString);
 //						content.setMsgLocalUrl(voicePath);
-						content.setMsgLocalUrl(remoteVoicePath);
+						content.setMsgLocalUrl(voiceName);
 						
 						// 指定发送消息的人为当前登录的人
 						content.setSendName(LoginTask.currentName);
@@ -344,9 +398,9 @@ public class ChatSingleAct extends BaseActivity {
 						content.setMsgType(2);
 						content.setSendId(db.findAll(Myself.class).get(0)
 								.getChannelId());
-						if (msg != null) {
-							content.setReceiveName(msg.getSendName());
-							content.setReceiveId(msg.getSendId());
+						if (notifyMsg != null) {
+							content.setReceiveName(notifyMsg.getSendName());
+							content.setReceiveId(notifyMsg.getSendId());
 						} else {
 							if (!Util.isEmpty(msgs)) {
 								content.setReceiveId(msgs.get(0).getSendId());
@@ -454,9 +508,9 @@ public class ChatSingleAct extends BaseActivity {
 				content.setMsgType(1);
 				content.setSendId(db.findAll(Myself.class).get(0)
 						.getChannelId());
-				if (msg != null) {
-					content.setReceiveName(msg.getSendName());
-					content.setReceiveId(msg.getSendId());
+				if (notifyMsg != null) {
+					content.setReceiveName(notifyMsg.getSendName());
+					content.setReceiveId(notifyMsg.getSendId());
 				} else {
 					if (!Util.isEmpty(msgs)) {
 						content.setReceiveId(msgs.get(0).getSendId());

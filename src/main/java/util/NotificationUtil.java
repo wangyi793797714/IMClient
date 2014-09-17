@@ -31,7 +31,6 @@ public class NotificationUtil {
         nm.notify(R.string.app_name, n);
     }
     
-    
      public  void  sendBroadcast(Context act,Content content){
          Intent intent = new Intent();
          intent.putExtra("content",content );
