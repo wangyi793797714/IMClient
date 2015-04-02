@@ -36,6 +36,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -126,6 +127,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 		getActionBar().setCustomView(R.layout.main_action_button);
 		getActionBar().setDisplayShowCustomEnabled(true);
 		db = FinalDb.create(this, FileOperator.getDbPath(this), true);
+		
+		Intent intent=new Intent();
+        intent.setClass(this, HeartbeatService.class);
+        startService(intent);
+		
 		pager = (ViewPager) findViewById(R.id.main_pager);
 		page1 = (Button) findViewById(R.id.button1);
 		page2 = (Button) findViewById(R.id.button2);

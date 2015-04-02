@@ -39,7 +39,7 @@ public interface Const {
 
 	// public static final String BASE_URL =
 	// "http://192.168.1.84:8080/IMServer/api/";
-	public static final String BASE_URL = "http://192.168.1.4:8080/IMServer/api/";
+	public static final String BASE_URL = "http://170.240.100.124:8080/IMServer/api/";
 
 	public static final String DB_FOLDER_NAME = "IM";
 
@@ -50,7 +50,7 @@ public interface Const {
 	public static final String LOCAL__VOICE_FOLDER = "IMVoice";
 
 	// public static final String NEETY_IP = "192.168.1.84";
-	public static final String NEETY_IP = "192.168.1.4";
+	public static final String NEETY_IP = "170.240.100.124";
 
 	public static final int NETTY_PORT = 9527;
 }

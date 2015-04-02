@@ -31,7 +31,14 @@ import vo.Myself;
 import adapter.OnlineAdapter;
 import android.app.Activity;
 import android.content.Intent;
+import aysntask.BaseTask;
+
+import com.activity.HeartbeatService;
+
 import config.Const;
+
+
+
 
 public class FetchOnlineUserTask extends BaseTask<Myself, Void, List<Myself>> {
 
