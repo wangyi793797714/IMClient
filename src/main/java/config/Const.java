@@ -27,6 +27,9 @@ public interface Const {
 
 	/** 同意添加好友请求 */
 	public static final String ACTION_ADDFRIEND_REPONSE = "add_friend_response";
+	
+	/**断线重连通知*/
+	public static final String ACTION_RECONNECT = "action_reconnect";
 
 	/** 收到私聊消息 */
 	public static final String ACTION_SINGLE_MSG = "single_msg";
@@ -44,6 +47,8 @@ public interface Const {
 	public static final String DB_FOLDER_NAME = "IM";
 
 	public static final String DB__NAME = "IM.db";
+	public static final String SP_NAME = "imclient";
+	public static final String USER_NAME = "user_name";
 
 	public static final String LOCAL__IMAGE_FOLDER = "IMImage";
 

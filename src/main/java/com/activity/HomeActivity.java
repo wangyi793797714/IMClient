@@ -65,6 +65,7 @@ import application.IMApplication;
 import aysntask.AddFriendRequestTask;
 import aysntask.FetchOnlineUserTask;
 import broadcast.NotifiReceiver;
+import broadcast.ReconnectReceiver;
 import broadcast.SingleChatReceiver;
 import broadcast.UserOnlineReceiver;
 import config.Const;
@@ -106,6 +107,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 	private UserOnlineReceiver uReceiver = null;
 	private NotifiReceiver nReceiver = null;
 	private SingleChatReceiver sReceiver = null;
+	private ReconnectReceiver rReceiver = null;
+	
 
 	/** 消息容器：key：用户编号 */
 	public static Map<Integer, List<Content>> singleMsgs = new ConcurrentHashMap<Integer, List<Content>>();
@@ -340,7 +343,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 		uReceiver = new UserOnlineReceiver(adapter, this);
 		nReceiver = new NotifiReceiver(adapter, onlineList);
 		sReceiver = new SingleChatReceiver(adapter, onlineList, this);
+		rReceiver=new ReconnectReceiver(adapter, this);
+		
 		registerBoradcastReceiver(uReceiver);
+		reconnectBoradcastReceiver(rReceiver);
 		registerBoradcastMsg(sReceiver);
 		registerNotifiReceiver(nReceiver);
 	}
@@ -348,6 +354,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener,
 	public void registerBoradcastReceiver(BroadcastReceiver receiver) {
 		IntentFilter myIntentFilter = new IntentFilter();
 		myIntentFilter.addAction(Const.ACTION_ON_OR_OFF_LINE);
+		IMApplication.APP.reReceiver(receiver, myIntentFilter);
+	}
+	public void reconnectBoradcastReceiver(BroadcastReceiver receiver) {
+		IntentFilter myIntentFilter = new IntentFilter();
+		myIntentFilter.addAction(Const.ACTION_RECONNECT);
 		IMApplication.APP.reReceiver(receiver, myIntentFilter);
 	}
 

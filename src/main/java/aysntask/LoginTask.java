@@ -18,6 +18,7 @@ import com.activity.HomeActivity;
 import com.activity.LoginAct;
 
 import util.FileOperator;
+import util.SpUtil;
 import util.Util;
 import vo.Content;
 import vo.LoginSucsess;
@@ -53,6 +54,8 @@ public class LoginTask extends BaseTask<Myself, Void, LoginSucsess> {
         ResponseEntity<LoginSucsess> resp = rest.exchange(url, HttpMethod.GET, requestEntity,
                 LoginSucsess.class);
         if (resp.getStatusCode() == HttpStatus.OK) {
+        	SpUtil sp=new SpUtil(act);
+        	sp.setValue(Const.USER_NAME, info.getName());
             return resp.getBody();
         }
         return null;
